@@ -72,7 +72,7 @@ func (svc *SysMenuSvc) AddMenu(menu dto.AddMenuReq) error {
         }
     } else {
         s.Where("parent_id = ?", menu.ParentId)
-        s.Where("auth_code = ?", menu.AuthCode)
+        s.Where("auth_mark = ?", menu.AuthMark)
         duplicateAuth, err := dao.Count[model.SysMenu](s)
         if err != nil {
             return err
@@ -163,7 +163,7 @@ func (svc *SysMenuSvc) DelMenu(id any) error {
 }
 
 // getAsyncRoutesChildrenList 获取pure admin子菜单列表
-func getAsyncRoutesChildrenList(menu *dto.PureMenu, treeMap map[uint][]dto.PureMenu) (err error) {
+func getAsyncRoutesChildrenList(menu *dto.ArtMenu, treeMap map[uint][]dto.ArtMenu) (err error) {
     menu.Children = treeMap[menu.Id]
     for i := 0; i < len(menu.Children); i++ {
         err = getAsyncRoutesChildrenList(&menu.Children[i], treeMap)
@@ -172,7 +172,7 @@ func getAsyncRoutesChildrenList(menu *dto.PureMenu, treeMap map[uint][]dto.PureM
 }
 
 // GetAsyncRoutes 获取pure admin菜单
-func (svc *SysMenuSvc) GetAsyncRoutes(roleId uint, roleCode string) ([]dto.PureMenu, error) {
+func (svc *SysMenuSvc) GetAsyncRoutes(roleId uint, roleCode string) ([]dto.ArtMenu, error) {
     var roleMenuIds []uint
     if roleCode != global.SuperAdmin {
         err := dao.GormDB().Model(&model.SysRoleMenu{}).Where("role_id = ?", roleId).Pluck("menu_id", &roleMenuIds).Error
@@ -202,35 +202,37 @@ func (svc *SysMenuSvc) GetAsyncRoutes(roleId uint, roleCode string) ([]dto.PureM
     if err != nil {
         return nil, err
     }
-    menuMap := make(map[uint][]dto.PureMenu)
+    menuMap := make(map[uint][]dto.ArtMenu)
     for _, menu := range menus {
-        pureMenu := dto.PureMenu{
+        pureMenu := dto.ArtMenu{
             Id:        menu.Id,
             ParentId:  menu.ParentId,
             Path:      menu.Path,
             Name:      menu.Name,
             Redirect:  menu.Redirect,
             Component: menu.Component,
-            Meta: dto.PureMenuMeta{
-                Title:        menu.Title,
-                Icon:         menu.Icon,
-                ExtraIcon:    menu.ExtraIcon,
-                ShowLink:     menu.ShowLink,
-                ShowParent:   menu.ShowParent,
-                KeepAlive:    menu.KeepAlive,
-                FrameSrc:     menu.FrameSrc,
-                FrameLoading: menu.FrameLoading,
-                HiddenTag:    menu.HiddenTag,
-                ActivePath:   menu.ActivePath,
-                FixedTag:     menu.FixedTag,
+            Meta: dto.ArtMenuMeta{
+                Title:         menu.Title,
+                Icon:          menu.Icon,
+                ShowBadge:     menu.ShowBadge,
+                ShowTextBadge: menu.ShowTextBadge,
+                IsHide:        menu.IsHide,
+                IsHideTab:     menu.IsHideTab,
+                Link:          menu.Link,
+                IsIframe:      menu.IsIframe,
+                KeepAlive:     menu.KeepAlive,
+                FixedTab:      menu.FixedTab,
             },
         }
         if btnArr, ok := btnMap[menu.Id]; ok {
-            var auths []string
+            var auths []dto.ArtAuthItem
             for _, btn := range btnArr {
-                auths = append(auths, btn.AuthCode)
+                auths = append(auths, dto.ArtAuthItem{
+                    Title:    btn.Title,
+                    AuthMark: btn.AuthMark,
+                })
             }
-            pureMenu.Meta.Auths = auths
+            pureMenu.Meta.AuthList = auths
         }
         menuMap[menu.ParentId] = append(menuMap[menu.ParentId], pureMenu)
     }

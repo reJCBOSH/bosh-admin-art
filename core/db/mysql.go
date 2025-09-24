@@ -61,7 +61,7 @@ func initMysql(m config.Mysql) error {
     db.Raw("SELECT COUNT(*) FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = ?", m.Database).Scan(&count)
     // 不存在则创建数据库
     if count == 0 {
-        sql := fmt.Sprintf("CREATE DATABASE %s DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;", m.Database)
+        sql := fmt.Sprintf("CREATE DATABASE `%s` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;", m.Database)
         if err = db.Exec(sql).Error; err != nil {
             log.Error("创建数据库失败:", err)
             return err
