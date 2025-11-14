@@ -7,7 +7,7 @@ import request from '@/utils/http'
  */
 export function fetchLogin(params: Api.Auth.LoginParams) {
   return request.post<Api.Auth.LoginResponse>({
-    url: '/api/auth/login',
+    url: '/api/auth/user/login',
     params
     // showSuccessMessage: true // 显示成功消息
     // showErrorMessage: false // 不显示错误消息
@@ -25,5 +25,17 @@ export function fetchGetUserInfo() {
     // headers: {
     //   'X-Custom-Header': 'your-custom-value'
     // }
+  })
+}
+
+/**
+ * 刷新访问令牌
+ * @param refreshToken 刷新令牌
+ * @returns 新的访问令牌信息
+ */
+export function fetchRefreshToken(params: object) {
+  return request.post<Api.Auth.LoginResponse>({
+    url: '/api/auth/refresh',
+    params
   })
 }

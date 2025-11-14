@@ -65,6 +65,8 @@ export const useUserStore = defineStore(
     const accessToken = ref('')
     // 刷新令牌
     const refreshToken = ref('')
+    // 令牌过期时间
+    const expiresAt = ref(0)
 
     // 计算属性：获取用户信息
     const getUserInfo = computed(() => info.value)
@@ -125,13 +127,22 @@ export const useUserStore = defineStore(
     /**
      * 设置令牌
      * @param newAccessToken 访问令牌
-     * @param newRefreshToken 刷新令牌（可选）
+     * @param newRefreshToken 刷新令牌
+     * @param newExpiresAt 令牌过期时间
      */
-    const setToken = (newAccessToken: string, newRefreshToken?: string) => {
+    const setToken = (newAccessToken: string, newRefreshToken: string, newExpiresAt: number) => {
       accessToken.value = newAccessToken
-      if (newRefreshToken) {
-        refreshToken.value = newRefreshToken
-      }
+      refreshToken.value = newRefreshToken
+      expiresAt.value = newExpiresAt
+    }
+
+    /**
+     * 格式化令牌
+     * @param token 令牌
+     * @returns 格式化后的令牌
+     */
+    const formatToken = (token: string) => {
+      return 'Bearer ' + token
     }
 
     /**
@@ -151,6 +162,8 @@ export const useUserStore = defineStore(
       accessToken.value = ''
       // 清空刷新令牌
       refreshToken.value = ''
+      // 重置令牌过期时间
+      expiresAt.value = 0
       // 清空工作台已打开页面
       useWorktabStore().opened = []
       // 移除iframe路由缓存
@@ -172,6 +185,7 @@ export const useUserStore = defineStore(
       searchHistory,
       accessToken,
       refreshToken,
+      expiresAt,
       getUserInfo,
       getSettingState,
       getWorktabState,
@@ -182,6 +196,7 @@ export const useUserStore = defineStore(
       setLockStatus,
       setLockPassword,
       setToken,
+      formatToken,
       logOut
     }
   },

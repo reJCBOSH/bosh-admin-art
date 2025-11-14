@@ -20,6 +20,7 @@ import { ApiStatus } from './status'
 import { HttpError, handleError, showError, showSuccess } from './error'
 import { $t } from '@/locales'
 import { BaseResponse } from '@/types'
+import { fetchRefreshToken } from '@/api/auth'
 
 /** 请求配置常量 */
 const REQUEST_TIMEOUT = 15000
@@ -27,6 +28,16 @@ const LOGOUT_DELAY = 500
 const MAX_RETRIES = 0
 const RETRY_DELAY = 1000
 const UNAUTHORIZED_DEBOUNCE_TIME = 3000
+const TOKEN_REFRESH_DURATION = 5 * 60 * 1000 // 5分钟
+
+/** 不需要token的API白名单 */
+const WHITE_LIST_APIS = ['/login', '/refreshToken']
+
+/** `token`过期后，暂存待执行的请求 */
+let requests: any[] = []
+
+/** 防止重复刷新`token` */
+let isRefreshing = false
 
 /** 401防抖状态 */
 let isUnauthorizedErrorShown = false
@@ -63,15 +74,43 @@ const axiosInstance = axios.create({
 
 /** 请求拦截器 */
 axiosInstance.interceptors.request.use(
-  (request: InternalAxiosRequestConfig) => {
-    const { accessToken } = useUserStore()
-    if (accessToken) request.headers.set('Authorization', accessToken)
-
+  async (request: InternalAxiosRequestConfig) => {
     if (request.data && !(request.data instanceof FormData) && !request.headers['Content-Type']) {
       request.headers.set('Content-Type', 'application/json')
       request.data = JSON.stringify(request.data)
     }
-
+    if (!WHITE_LIST_APIS.some((url) => request.url?.endsWith(url))) {
+      const useUser = useUserStore()
+      if (useUser.accessToken) {
+        const now = new Date().getTime()
+        // 提前5分钟刷新，防止前端请求时access token未过期，到后端access token过期的情况
+        const expired = useUser.expiresAt - now <= TOKEN_REFRESH_DURATION
+        if (expired) {
+          if (!isRefreshing) {
+            isRefreshing = true
+            try {
+              const res = await fetchRefreshToken({ refreshToken: useUser.refreshToken })
+              useUser.setToken(res.accessToken, res.refreshToken, res.expiresAt)
+              request.headers.set('Authorization', useUser.formatToken(res.accessToken))
+              requests.forEach((callback) => callback(res.accessToken))
+              requests = []
+            } finally {
+              isRefreshing = false
+            }
+          } else {
+            // 正在刷新token，将请求加入队列等待
+            return new Promise((resolve) => {
+              requests.push((newToken: string) => {
+                request.headers.set('Authorization', useUser.formatToken(newToken))
+                resolve(request)
+              })
+            })
+          }
+        } else {
+          request.headers.set('Authorization', useUser.formatToken(useUser.accessToken))
+        }
+      }
+    }
     return request
   },
   (error) => {
@@ -105,7 +144,9 @@ function handleUnauthorizedError(message?: string): never {
 
   if (!isUnauthorizedErrorShown) {
     isUnauthorizedErrorShown = true
-    logOut()
+    setTimeout(() => {
+      useUserStore().logOut()
+    }, LOGOUT_DELAY)
 
     unauthorizedTimer = setTimeout(resetUnauthorizedError, UNAUTHORIZED_DEBOUNCE_TIME)
 
@@ -121,13 +162,6 @@ function resetUnauthorizedError() {
   isUnauthorizedErrorShown = false
   if (unauthorizedTimer) clearTimeout(unauthorizedTimer)
   unauthorizedTimer = null
-}
-
-/** 退出登录函数 */
-function logOut() {
-  setTimeout(() => {
-    useUserStore().logOut()
-  }, LOGOUT_DELAY)
 }
 
 /** 是否需要重试 */
