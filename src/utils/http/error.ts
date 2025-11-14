@@ -74,7 +74,7 @@ export class HttpError extends Error {
     this.name = 'HttpError'
     this.code = code
     this.data = options?.data
-    this.timestamp = new Date().toISOString()
+    this.timestamp = new Date().toLocaleString()
     this.url = options?.url
     this.method = options?.method
   }
