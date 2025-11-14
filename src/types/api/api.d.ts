@@ -69,7 +69,7 @@ declare namespace Api {
     }
 
     /** 登录响应 */
-    interface LoginResponse {
+    interface TokenResponse {
       accessToken: string
       refreshToken: string
       expiresAt: number
@@ -80,9 +80,19 @@ declare namespace Api {
       buttons: string[]
       roles: string[]
       userId: number
-      userName: string
+      username: string
+      avatar: string
+      nickname: string
+      gender: number
+      birthday: string
       email: string
-      avatar?: string
+      mobile: string
+      introduce: string
+      pwdUpdatedAt: string
+    }
+
+    interface refreshTokenParams {
+      refreshToken: string
     }
   }
 

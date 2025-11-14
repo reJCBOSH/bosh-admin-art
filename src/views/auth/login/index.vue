@@ -91,7 +91,8 @@
   import { getCssVar } from '@/utils/ui'
   import { useI18n } from 'vue-i18n'
   import { HttpError } from '@/utils/http/error'
-  import { fetchLogin, fetchGetUserInfo } from '@/api/auth'
+  import { fetchLogin } from '@/api/auth'
+  import { fetchGetSelfInfo } from '@/api/user'
   import { ElNotification, type FormInstance, type FormRules } from 'element-plus'
   import { useSettingStore } from '@/store/modules/setting'
 
@@ -154,7 +155,7 @@
 
       // 存储token和用户信息
       userStore.setToken(accessToken, refreshToken, expiresAt)
-      const userInfo = await fetchGetUserInfo()
+      const userInfo = await fetchGetSelfInfo()
       userStore.setUserInfo(userInfo)
       userStore.setLoginStatus(true)
 

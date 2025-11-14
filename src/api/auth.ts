@@ -6,7 +6,7 @@ import request from '@/utils/http'
  * @returns 登录响应
  */
 export function fetchLogin(params: Api.Auth.LoginParams) {
-  return request.post<Api.Auth.LoginResponse>({
+  return request.post<Api.Auth.TokenResponse>({
     url: '/api/auth/user/login',
     params
     // showSuccessMessage: true // 显示成功消息
@@ -15,26 +15,12 @@ export function fetchLogin(params: Api.Auth.LoginParams) {
 }
 
 /**
- * 获取用户信息
- * @returns 用户信息
- */
-export function fetchGetUserInfo() {
-  return request.get<Api.Auth.UserInfo>({
-    url: '/api/user/info'
-    // 自定义请求头
-    // headers: {
-    //   'X-Custom-Header': 'your-custom-value'
-    // }
-  })
-}
-
-/**
  * 刷新访问令牌
  * @param refreshToken 刷新令牌
  * @returns 新的访问令牌信息
  */
-export function fetchRefreshToken(params: object) {
-  return request.post<Api.Auth.LoginResponse>({
+export function fetchRefreshToken(params: Api.Auth.refreshTokenParams) {
+  return request.post<Api.Auth.TokenResponse>({
     url: '/api/auth/refresh',
     params
   })

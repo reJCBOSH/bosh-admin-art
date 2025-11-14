@@ -106,7 +106,11 @@ export interface UserState {
   /** 用户信息 */
   userInfo: Api.Auth.UserInfo | null
   /** 认证令牌 */
-  token: string | null
+  accessToken: string | null
+  /** 刷新令牌 */
+  refreshToken: string | null
+  /** 令牌过期时间 */
+  expiresAt: number
   /** 用户角色列表 */
   roles: string[]
   /** 用户权限列表 */
