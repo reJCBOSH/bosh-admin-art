@@ -119,6 +119,7 @@
 
   const userStore = useUserStore()
   const router = useRouter()
+  const route = useRoute()
   const isPassing = ref(false)
   const isClickPass = ref(false)
 
@@ -161,7 +162,10 @@
 
       // 登录成功处理
       showLoginSuccessNotice()
-      router.push('/')
+
+      // 获取 redirect 参数，如果存在则跳转到指定页面，否则跳转到首页
+      const redirect = route.query.redirect as string
+      router.push(redirect || '/')
     } catch (error) {
       // 处理 HttpError
       if (error instanceof HttpError) {
@@ -192,7 +196,7 @@
         zIndex: 10000,
         message: `${t('login.success.message')}, ${systemName}!`
       })
-    }, 150)
+    }, 1000)
   }
 </script>
 
