@@ -92,7 +92,6 @@
   import { useI18n } from 'vue-i18n'
   import { HttpError } from '@/utils/http/error'
   import { fetchLogin } from '@/api/auth'
-  import { fetchGetSelfInfo } from '@/api/user'
   import { ElNotification, type FormInstance, type FormRules } from 'element-plus'
   import { useSettingStore } from '@/store/modules/setting'
 
@@ -154,10 +153,8 @@
         throw new Error('Login failed - no token received')
       }
 
-      // 存储token和用户信息
+      // 存储 token 和登录状态
       userStore.setToken(accessToken, refreshToken, expiresAt)
-      const userInfo = await fetchGetSelfInfo()
-      userStore.setUserInfo(userInfo)
       userStore.setLoginStatus(true)
 
       // 登录成功处理

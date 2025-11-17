@@ -79,7 +79,11 @@ axiosInstance.interceptors.request.use(
       request.headers.set('Content-Type', 'application/json')
       request.data = JSON.stringify(request.data)
     }
-    if (!WHITE_LIST_APIS.some((url) => request.url?.endsWith(url))) {
+    console.log('request', request)
+    // 检查是否在白名单中
+    const isInWhiteList = WHITE_LIST_APIS.some((url) => request.url?.endsWith(url))
+
+    if (!isInWhiteList) {
       const useUser = useUserStore()
       if (useUser.accessToken) {
         const now = new Date().getTime()
@@ -94,15 +98,26 @@ axiosInstance.interceptors.request.use(
               request.headers.set('Authorization', useUser.formatToken(res.accessToken))
               requests.forEach((callback) => callback(res.accessToken))
               requests = []
+            } catch (error) {
+              // 刷新token失败时，需要重置刷新状态，并清空待执行请求队列
+              requests = []
+              // 让所有等待的请求失败
+              requests.forEach((callback) => callback(null))
+              return Promise.reject(error)
             } finally {
               isRefreshing = false
             }
           } else {
             // 正在刷新token，将请求加入队列等待
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
               requests.push((newToken: string) => {
-                request.headers.set('Authorization', useUser.formatToken(newToken))
-                resolve(request)
+                if (newToken) {
+                  request.headers.set('Authorization', useUser.formatToken(newToken))
+                  resolve(request)
+                } else {
+                  // token刷新失败，拒绝所有等待的请求
+                  reject(new Error('Token refresh failed'))
+                }
               })
             })
           }

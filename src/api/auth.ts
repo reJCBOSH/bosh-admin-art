@@ -21,7 +21,7 @@ export function fetchLogin(params: Api.Auth.LoginParams) {
  */
 export function fetchRefreshToken(params: Api.Auth.refreshTokenParams) {
   return request.post<Api.Auth.TokenResponse>({
-    url: '/api/auth/refresh',
+    url: '/api/auth/refreshToken',
     params
   })
 }
