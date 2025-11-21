@@ -103,6 +103,9 @@ axiosInstance.interceptors.request.use(
               requests = []
               // 让所有等待的请求失败
               requests.forEach((callback) => callback(null))
+              setTimeout(() => {
+                useUserStore().logOut()
+              }, LOGOUT_DELAY)
               return Promise.reject(error)
             } finally {
               isRefreshing = false
