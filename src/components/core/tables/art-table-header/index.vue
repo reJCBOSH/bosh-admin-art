@@ -28,7 +28,7 @@
 
       <ElDropdown v-if="shouldShow('size')" @command="handleTableSizeChange">
         <div class="button">
-          <ArtSvgIcon icon="ri:arrow-up-down-fill" />
+          <ArtSvgIcon icon="ri:expand-height-fill" />
         </div>
         <template #dropdown>
           <ElDropdownMenu>
@@ -57,7 +57,7 @@
       <ElPopover v-if="shouldShow('columns')" placement="bottom" trigger="click">
         <template #reference>
           <div class="button">
-            <ArtSvgIcon icon="ri:align-right" />
+            <ArtSvgIcon icon="ri:stack-line" />
           </div>
         </template>
         <div>
@@ -89,10 +89,9 @@
                   @update:model-value="(val) => updateColumnVisibility(item, val)"
                   :disabled="item.disabled"
                   class="flex-1 min-w-0 [&_.el-checkbox__label]:overflow-hidden [&_.el-checkbox__label]:text-ellipsis [&_.el-checkbox__label]:whitespace-nowrap"
-                  >{{
-                    item.label || (item.type === 'selection' ? t('table.selection') : '')
-                  }}</ElCheckbox
                 >
+                  {{ item.label || (item.type === 'selection' ? t('table.selection') : '') }}
+                </ElCheckbox>
               </div>
             </VueDraggable>
           </ElScrollbar>
@@ -106,15 +105,15 @@
           </div>
         </template>
         <div>
-          <ElCheckbox v-if="showZebra" v-model="isZebra" :value="true">{{
-            t('table.zebra')
-          }}</ElCheckbox>
-          <ElCheckbox v-if="showBorder" v-model="isBorder" :value="true">{{
-            t('table.border')
-          }}</ElCheckbox>
-          <ElCheckbox v-if="showHeaderBackground" v-model="isHeaderBackground" :value="true">{{
-            t('table.headerBackground')
-          }}</ElCheckbox>
+          <ElCheckbox v-if="showZebra" v-model="isZebra" :value="true">
+            {{ t('table.zebra') }}
+          </ElCheckbox>
+          <ElCheckbox v-if="showBorder" v-model="isBorder" :value="true">
+            {{ t('table.border') }}
+          </ElCheckbox>
+          <ElCheckbox v-if="showHeaderBackground" v-model="isHeaderBackground" :value="true">
+            {{ t('table.headerBackground') }}
+          </ElCheckbox>
         </div>
       </ElPopover>
       <slot name="right"></slot>

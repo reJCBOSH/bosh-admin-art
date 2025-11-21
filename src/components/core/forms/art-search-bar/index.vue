@@ -71,13 +71,20 @@
         <ElCol :xs="24" :sm="24" :md="span" :lg="span" :xl="span" class="action-column">
           <div class="action-buttons-wrapper" :style="actionButtonsStyle">
             <div class="form-buttons">
-              <ElButton v-if="showReset" class="reset-button" @click="handleReset" v-ripple>
+              <ElButton
+                v-if="showReset"
+                :icon="RefreshRight"
+                class="reset-button"
+                @click="handleReset"
+                v-ripple
+              >
                 {{ t('table.searchBar.reset') }}
               </ElButton>
               <ElButton
                 v-if="showSearch"
                 type="primary"
                 class="search-button"
+                :icon="Search"
                 @click="handleSearch"
                 v-ripple
                 :disabled="disabledSearch"
@@ -125,6 +132,7 @@
     type FormInstance
   } from 'element-plus'
   import { calculateResponsiveSpan, type ResponsiveBreakpoint } from '@/utils/form/responsive'
+  import { RefreshRight, Search } from '@element-plus/icons-vue'
 
   defineOptions({ name: 'ArtSearchBar' })
 
