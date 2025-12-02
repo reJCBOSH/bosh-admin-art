@@ -14,13 +14,19 @@
  * @author Art Design Pro Team
  */
 
-import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import axios, {
+  AxiosRequestConfig,
+  AxiosResponse,
+  CustomParamsSerializer,
+  InternalAxiosRequestConfig
+} from 'axios'
 import { useUserStore } from '@/store/modules/user'
 import { ApiStatus } from './status'
 import { HttpError, handleError, showError, showSuccess } from './error'
 import { $t } from '@/locales'
 import { BaseResponse } from '@/types'
 import { fetchRefreshToken } from '@/api/auth'
+import { stringify } from 'qs'
 
 /** 请求配置常量 */
 const REQUEST_TIMEOUT = 15000
@@ -69,7 +75,10 @@ const axiosInstance = axios.create({
       }
       return data
     }
-  ]
+  ],
+  paramsSerializer: {
+    serialize: stringify as unknown as CustomParamsSerializer
+  }
 })
 
 /** 请求拦截器 */
@@ -79,7 +88,6 @@ axiosInstance.interceptors.request.use(
       request.headers.set('Content-Type', 'application/json')
       request.data = JSON.stringify(request.data)
     }
-    console.log('request', request)
     // 检查是否在白名单中
     const isInWhiteList = WHITE_LIST_APIS.some((url) => request.url?.endsWith(url))
 
