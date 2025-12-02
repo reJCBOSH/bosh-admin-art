@@ -12,7 +12,7 @@
       <ElRow :gutter="gutter">
         <ElCol
           v-for="item in visibleFormItems"
-          :key="item.key"
+          :key="item.prop"
           :xs="getColSpan(item.span, 'xs')"
           :sm="getColSpan(item.span, 'sm')"
           :md="getColSpan(item.span, 'md')"
@@ -20,17 +20,17 @@
           :xl="getColSpan(item.span, 'xl')"
         >
           <ElFormItem
-            :prop="item.key"
+            :prop="item.prop"
             :label-width="item.label ? item.labelWidth || labelWidth : undefined"
           >
             <template #label v-if="item.label">
               <component v-if="typeof item.label !== 'string'" :is="item.label" />
               <span v-else>{{ item.label }}</span>
             </template>
-            <slot :name="item.key" :item="item" :modelValue="modelValue">
+            <slot :name="item.prop" :item="item" :modelValue="modelValue">
               <component
                 :is="getComponent(item)"
-                v-model="modelValue[item.key]"
+                v-model="modelValue[item.prop]"
                 v-bind="getProps(item)"
               >
                 <!-- 下拉选择 -->
@@ -166,7 +166,7 @@
   // 表单项配置
   export interface SearchFormItem {
     /** 表单项的唯一标识 */
-    key: string
+    prop: string
     /** 表单项的标签文本或自定义渲染函数 */
     label: string | (() => VNode) | Component
     /** 表单项标签的宽度，会覆盖 Form 的 labelWidth */
@@ -187,6 +187,8 @@
     slots?: Record<string, (() => any) | undefined>
     /** 表单项的占位符文本 */
     placeholder?: string
+    /** 清空表单项 */
+    clearable?: boolean
     /** 更多属性配置请参考 ElementPlus 官方文档 */
   }
 
@@ -216,6 +218,8 @@
     showSearch?: boolean
     /** 是否禁用搜索按钮 */
     disabledSearch?: boolean
+    /** 是否在搜索前清理空值参数 */
+    cleanParams?: boolean
   }
 
   const props = withDefaults(defineProps<SearchBarProps>(), {
@@ -230,12 +234,13 @@
     buttonLeftLimit: 2,
     showReset: true,
     showSearch: true,
-    disabledSearch: false
+    disabledSearch: false,
+    cleanParams: true // 默认启用参数清理功能
   })
 
   interface SearchBarEmits {
-    reset: []
-    search: []
+    (e: 'reset'): void
+    (e: 'search'): void
   }
 
   const emit = defineEmits<SearchBarEmits>()
@@ -243,16 +248,48 @@
   const modelValue = defineModel<Record<string, any>>({ default: {} })
 
   /**
+   * 清理搜索参数，移除空字符串、null 和 undefined 字段
+   */
+  const cleanSearchParams = (params: Record<string, any>) => {
+    const cleaned = { ...params }
+    Object.keys(cleaned).forEach((key) => {
+      const value = cleaned[key]
+      if (value === '' || value === null || value === undefined) {
+        delete cleaned[key]
+      }
+    })
+    return cleaned
+  }
+
+  /**
    * 是否展开状态
    */
   const isExpanded = ref(props.defaultExpanded)
 
-  const rootProps = ['label', 'labelWidth', 'key', 'type', 'hidden', 'span', 'slots']
+  const rootProps = ['label', 'labelWidth', 'prop', 'type', 'hidden', 'span', 'slots']
 
   const getProps = (item: SearchFormItem) => {
-    if (item.props) return item.props
-    const props = { ...item }
-    rootProps.forEach((key) => delete (props as Record<string, any>)[key])
+    let props = item.props ? { ...item.props } : { ...item }
+
+    // 如果没有显式设置 placeholder，并且 item.label 是字符串，则生成默认的 placeholder
+    if (!props.placeholder && typeof item.label === 'string') {
+      // 判断是否为选择类型组件
+      const selectTypes = ['select', 'checkboxgroup', 'radiogroup', 'cascader', 'treeselect']
+      if (selectTypes.includes(item.type as string)) {
+        // 选择类型组件使用专门的占位符
+        props.placeholder = `${t('table.searchBar.searchSelectPlaceholder')}${item.label}`
+      } else {
+        // 其他类型组件使用"请输入"+label的格式
+        props.placeholder = `${t('table.searchBar.searchInputPlaceholder')}${item.label}`
+      }
+    }
+
+    if (props.clearable === undefined) {
+      props.clearable = true
+    }
+
+    // 删除属于根属性的字段
+    rootProps.forEach((prop) => delete (props as Record<string, any>)[prop])
     return props
   }
 
@@ -260,9 +297,9 @@
   const getSlots = (item: SearchFormItem) => {
     if (!item.slots) return {}
     const validSlots: Record<string, () => any> = {}
-    Object.entries(item.slots).forEach(([key, slotFn]) => {
+    Object.entries(item.slots).forEach(([prop, slotFn]) => {
       if (slotFn) {
-        validSlots[key] = slotFn
+        validSlots[prop] = slotFn
       }
     })
     return validSlots
@@ -345,7 +382,7 @@
     // 清空所有表单项值（包含隐藏项）
     Object.assign(
       modelValue.value,
-      Object.fromEntries(props.items.map(({ key }) => [key, undefined]))
+      Object.fromEntries(props.items.map(({ prop }) => [prop, undefined]))
     )
 
     // 触发 reset 事件
@@ -356,6 +393,20 @@
    * 处理搜索事件
    */
   const handleSearch = () => {
+    // 根据 cleanParams 属性决定是否清理参数
+    if (props.cleanParams) {
+      const cleanedParams = cleanSearchParams(modelValue.value)
+      // 直接更新 modelValue
+      Object.keys(modelValue.value).forEach((key) => {
+        if (!(key in cleanedParams)) {
+          delete modelValue.value[key]
+        }
+      })
+
+      Object.assign(modelValue.value, cleanedParams)
+    }
+
+    // 触发搜索事件
     emit('search')
   }
 
