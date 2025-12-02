@@ -187,8 +187,6 @@
     slots?: Record<string, (() => any) | undefined>
     /** 表单项的占位符文本 */
     placeholder?: string
-    /** 清空表单项 */
-    clearable?: boolean
     /** 更多属性配置请参考 ElementPlus 官方文档 */
   }
 
@@ -269,10 +267,19 @@
   const rootProps = ['label', 'labelWidth', 'prop', 'type', 'hidden', 'span', 'slots']
 
   const getProps = (item: SearchFormItem) => {
-    let props = item.props ? { ...item.props } : { ...item }
+    let props: any = {}
+
+    // 如果 item.props 不存在，则从 item 中复制非根属性
+    if (!item.props) {
+      const itemCopy = { ...item }
+      rootProps.forEach((prop) => delete (itemCopy as Record<string, any>)[prop])
+      props = { ...itemCopy }
+    } else {
+      props = { ...item.props }
+    }
 
     // 如果没有显式设置 placeholder，并且 item.label 是字符串，则生成默认的 placeholder
-    if (!props.placeholder && typeof item.label === 'string') {
+    if (!item.placeholder && typeof item.label === 'string') {
       // 判断是否为选择类型组件
       const selectTypes = ['select', 'checkboxgroup', 'radiogroup', 'cascader', 'treeselect']
       if (selectTypes.includes(item.type as string)) {
@@ -288,8 +295,6 @@
       props.clearable = true
     }
 
-    // 删除属于根属性的字段
-    rootProps.forEach((prop) => delete (props as Record<string, any>)[prop])
     return props
   }
 
