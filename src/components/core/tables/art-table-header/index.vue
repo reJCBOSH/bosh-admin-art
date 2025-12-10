@@ -61,6 +61,10 @@
           </div>
         </template>
         <div>
+          <div class="flex-cb">
+            <div>列设置</div>
+            <ElButton link @click="resetColumns">重置</ElButton>
+          </div>
           <ElScrollbar max-height="380px">
             <VueDraggable
               v-model="columns"
@@ -122,7 +126,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref, onMounted, onUnmounted } from 'vue'
+  import { computed, ref, onMounted, onUnmounted, watch, inject } from 'vue'
   import { storeToRefs } from 'pinia'
   import { TableSizeEnum } from '@/enums/formEnum'
   import { useTableStore } from '@/store/modules/table'
@@ -130,6 +134,7 @@
   import { useI18n } from 'vue-i18n'
   import type { ColumnOption } from '@/types/component'
   import { ElScrollbar } from 'element-plus'
+  import { cloneDeep } from '@pureadmin/utils'
 
   defineOptions({ name: 'ArtTableHeader' })
 
@@ -171,6 +176,36 @@
     (e: 'search'): void
     (e: 'update:showSearchBar', value: boolean): void
   }>()
+
+  // 使用 inject 获取 resetColumns 方法
+  const tableColumnControl = inject('tableColumnControl', null)
+
+  const initialColumns = ref([])
+
+  // 监听 columns 变化，更新初始列配置
+  watch(
+    () => columns.value,
+    (newColumns) => {
+      // 只有当 initialColumns 为空时才更新，确保保存的是初始状态
+      if (initialColumns.value.length === 0 && newColumns.length > 0) {
+        initialColumns.value = cloneDeep(newColumns)
+      }
+    },
+    { immediate: true }
+  )
+
+  const resetColumns = () => {
+    // 重置为初始列配置
+    if (initialColumns.value.length > 0) {
+      // 发送事件通知父组件处理重置逻辑
+      if (tableColumnControl && typeof tableColumnControl.resetColumns === 'function') {
+        tableColumnControl.resetColumns()
+      } else {
+        // 如果没有注入的方法，则直接重置
+        columns.value = cloneDeep(initialColumns.value)
+      }
+    }
+  }
 
   /**
    * 获取列的显示状态
