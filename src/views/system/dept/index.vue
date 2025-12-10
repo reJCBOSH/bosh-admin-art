@@ -60,18 +60,16 @@
         @refresh="getDataList"
       >
         <template #left>
-          <ElSpace wrap>
-            <ElButton @click="handleExpand" v-ripple>
-              <template #icon>
-                <ArtSvgIcon
-                  icon="ri:expand-right-line"
-                  :style="{ transform: expandAll ? 'rotate(90deg)' : 'none' }"
-                />
-              </template>
-              {{ expandAll ? '收起' : '展开' }}
-            </ElButton>
-            <ElButton type="primary" :icon="Plus" v-ripple @click="handleAdd">新增</ElButton>
-          </ElSpace>
+          <ElButton @click="handleExpand" v-ripple>
+            <template #icon>
+              <ArtSvgIcon
+                icon="ri:expand-right-line"
+                :style="{ transform: expandAll ? 'rotate(90deg)' : 'none' }"
+              />
+            </template>
+            {{ expandAll ? '收起' : '展开' }}
+          </ElButton>
+          <ElButton type="primary" :icon="Plus" v-ripple @click="handleAdd">新增</ElButton>
         </template>
       </ArtTableHeader>
 

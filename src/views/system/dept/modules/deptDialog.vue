@@ -29,11 +29,7 @@
   const formData = ref({})
   const getFormItems = () => {
     return [
-      {
-        label: '上级部门',
-        prop: 'parentId',
-        span: 24
-      },
+      { label: '上级部门', prop: 'parentId', span: 24 },
       { label: '部门名称', prop: 'deptName' },
       {
         label: '部门编码',
