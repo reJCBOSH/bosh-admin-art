@@ -28,7 +28,7 @@
 
       <ElDropdown v-if="shouldShow('size')" @command="handleTableSizeChange">
         <div class="button">
-          <ArtSvgIcon icon="ri:expand-height-fill" />
+          <ArtSvgIcon icon="ri:expand-height-line" />
         </div>
         <template #dropdown>
           <ElDropdownMenu>
