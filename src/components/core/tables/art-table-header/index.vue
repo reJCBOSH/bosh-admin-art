@@ -1,8 +1,16 @@
 <!-- 表格头部，包含表格大小、刷新、全屏、列设置、其他设置 -->
 <template>
   <div class="flex-cb max-md:!block" id="art-table-header">
-    <div class="flex-wrap">
-      <slot name="left"></slot>
+    <div class="flex-c">
+      <!-- 表格标题 -->
+      <div v-if="title || $slots.title" class="mr-4">
+        <slot name="title">
+          <span class="text-lg font-bold text-info">{{ title }}</span>
+        </slot>
+      </div>
+      <div class="flex-wrap">
+        <slot name="buttons"></slot>
+      </div>
     </div>
 
     <div class="flex-c md:justify-end max-md:mt-3 max-sm:!hidden">
@@ -141,6 +149,8 @@
   const { t } = useI18n()
 
   interface Props {
+    /** 表格标题 */
+    title?: string
     /** 斑马纹 */
     showZebra?: boolean
     /** 边框 */
@@ -158,6 +168,7 @@
   }
 
   const props = withDefaults(defineProps<Props>(), {
+    title: '',
     showZebra: true,
     showBorder: true,
     showHeaderBackground: true,

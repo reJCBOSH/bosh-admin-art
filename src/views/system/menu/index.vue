@@ -59,10 +59,11 @@
       <ArtTableHeader
         v-model:showSearchBar="showSearchBar"
         v-model:columns="columnChecks"
+        title="菜单列表"
         :loading="loading"
         @refresh="getDataList"
       >
-        <template #left>
+        <template #buttons>
           <ElButton @click="handleExpand" v-ripple>
             <template #icon>
               <ArtSvgIcon
