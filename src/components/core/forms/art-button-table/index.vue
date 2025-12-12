@@ -1,9 +1,9 @@
 <!-- 表格按钮 -->
 <template>
-  <ElTooltip :content="tooltipContent">
+  <ElTooltip :content="tooltipContent" placement="top">
     <div
       :class="[
-        'inline-flex items-center justify-center min-w-8 h-8 px-2.5 mr-2.5 text-sm c-p rounded-md',
+        'inline-flex items-center justify-center w-8 h-8 px-2.5 mr-2.5 text-sm c-p rounded-md',
         buttonClass
       ]"
       :style="{ backgroundColor: buttonBgColor, color: iconColor }"
@@ -44,7 +44,7 @@
     edit: { icon: 'ri:pencil-line', class: 'bg-secondary/12 text-secondary', tooltip: '修改' },
     delete: { icon: 'ri:delete-bin-5-line', class: 'bg-error/12 text-error', tooltip: '删除' },
     view: { icon: 'ri:eye-line', class: 'bg-info/12 text-info', tooltip: '查看' },
-    more: { icon: 'ri:more-2-fill', class: '', tooltip: '更多' }
+    more: { icon: 'ri:more-2-fill', class: 'bg-g-200 dark:bg-g-300/45 text-sm', tooltip: '更多' }
   } as const
 
   // 获取图标内容
