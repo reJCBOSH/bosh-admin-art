@@ -18,15 +18,15 @@
           >
             <ElFormItem :label="item.label" :prop="item.prop">
               <!-- 插槽优先 -->
-              <slot v-if="item.slot" :name="item.slot" :model="modelValue" />
-
-              <!-- 动态组件 + 属性透传 -->
-              <component
-                v-else
-                :is="getComponent(item)"
-                v-model="modelValue[item.prop]"
-                v-bind="getFieldAttrs(item)"
-              />
+              <!-- 使用动态插槽名，优先使用item.slot，否则使用item.prop -->
+              <slot :name="item.slot || item.prop" :model="modelValue">
+                <!-- 默认内容：当插槽没有内容时，渲染动态组件 -->
+                <component
+                  :is="getComponent(item)"
+                  v-model="modelValue[item.prop]"
+                  v-bind="getFieldAttrs(item)"
+                />
+              </slot>
             </ElFormItem>
           </ElCol>
         </template>
