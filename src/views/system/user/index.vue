@@ -3,259 +3,149 @@
 <!-- art-table-card 一个符合系统样式的 class，同时自动撑满剩余高度 -->
 <!-- 更多 useTable 使用示例请移步至 功能示例 下面的高级表格示例或者查看官方文档 -->
 <!-- useTable 文档：https://www.artd.pro/docs/zh/guide/hooks/use-table.html -->
-<template>
-  <div class="user-page art-full-height">
-    <!-- 搜索栏 -->
-    <UserSearch v-model="searchForm" @search="handleSearch" @reset="resetSearchParams"></UserSearch>
-
-    <ElCard class="art-table-card" shadow="never">
-      <!-- 表格头部 -->
-      <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
-        <template #left>
-          <ElSpace wrap>
-            <ElButton @click="showDialog('add')" v-ripple>新增用户</ElButton>
-          </ElSpace>
-        </template>
-      </ArtTableHeader>
-
-      <!-- 表格 -->
-      <ArtTable
-        :loading="loading"
-        :data="data"
-        :columns="columns"
-        :pagination="pagination"
-        @selection-change="handleSelectionChange"
-        @pagination:size-change="handleSizeChange"
-        @pagination:current-change="handleCurrentChange"
-      >
-      </ArtTable>
-
-      <!-- 用户弹窗 -->
-      <UserDialog
-        v-model:visible="dialogVisible"
-        :type="dialogType"
-        :user-data="currentUserData"
-        @submit="handleDialogSubmit"
-      />
-    </ElCard>
-  </div>
-</template>
-
 <script setup lang="ts">
-  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
-  import { ACCOUNT_TABLE_DATA } from '@/mock/temp/formData'
-  import { useTable } from '@/hooks/core/useTable'
-  import { fetchGetUserList } from '@/api/user'
-  import UserSearch from './modules/user-search.vue'
-  import UserDialog from './modules/user-dialog.vue'
-  import { ElTag, ElMessageBox, ElImage, ElMessage } from 'element-plus'
-  import { DialogType } from '@/types'
+  import { useUser } from './hooks'
+  import DeptTree from './modules/deptTree.vue'
+  import UserDialog from './modules/userDialog.vue'
+  import UserSearch from './modules/userSearch.vue'
 
-  defineOptions({ name: 'User' })
+  import { Plus } from '@element-plus/icons-vue'
 
-  type UserListItem = Api.SystemManage.UserListItem
-
-  // 弹窗相关
-  const dialogType = ref<DialogType>('add')
-  const dialogVisible = ref(false)
-  const currentUserData = ref<Partial<UserListItem>>({})
-
-  // 选中行
-  const selectedRows = ref<UserListItem[]>([])
-
-  // 搜索表单
-  const searchForm = ref({
-    userName: undefined,
-    userGender: undefined,
-    userPhone: undefined,
-    userEmail: undefined,
-    status: '1'
-  })
-
-  // 用户状态配置
-  const USER_STATUS_CONFIG = {
-    '1': { type: 'success' as const, text: '在线' },
-    '2': { type: 'info' as const, text: '离线' },
-    '3': { type: 'warning' as const, text: '异常' },
-    '4': { type: 'danger' as const, text: '注销' }
-  } as const
-
-  /**
-   * 获取用户状态配置
-   */
-  const getUserStatusConfig = (status: string) => {
-    return (
-      USER_STATUS_CONFIG[status as keyof typeof USER_STATUS_CONFIG] || {
-        type: 'info' as const,
-        text: '未知'
-      }
-    )
-  }
+  defineOptions({ name: 'UserList' })
 
   const {
+    //参数
+    loading,
+    showSearchBar,
+    searchParams,
+    tableRef,
     columns,
     columnChecks,
-    data,
-    loading,
+    dataList,
     pagination,
-    getData,
-    searchParams,
-    resetSearchParams,
+    roleOptions,
+    deptOptions,
+    treeData,
+    treeLoading,
+    dialogVisible,
+    dialogType,
+    dialogInfo,
+    // 方法
+    getDataList,
+    getRoleOptions,
+    getDeptOptions,
+    onTreeSelect,
+    handleReset,
+    handleSearch,
     handleSizeChange,
     handleCurrentChange,
-    refreshData
-  } = useTable({
-    // 核心配置
-    core: {
-      apiFn: fetchGetUserList,
-      apiParams: {
-        current: 1,
-        size: 20,
-        ...searchForm.value
-      },
-      // 自定义分页字段映射，未设置时将使用全局配置 tableConfig.ts 中的 paginationKey
-      // paginationKey: {
-      //   current: 'pageNum',
-      //   size: 'pageSize'
-      // },
-      columnsFactory: () => [
-        { type: 'selection' }, // 勾选列
-        { type: 'index', width: 60, label: '序号' }, // 序号
-        {
-          prop: 'userInfo',
-          label: '用户名',
-          width: 280,
-          // visible: false, // 默认是否显示列
-          formatter: (row) => {
-            return h('div', { class: 'user flex-c' }, [
-              h(ElImage, {
-                class: 'size-9.5 rounded-md',
-                src: row.avatar,
-                previewSrcList: [row.avatar],
-                // 图片预览是否插入至 body 元素上，用于解决表格内部图片预览样式异常
-                previewTeleported: true
-              }),
-              h('div', { class: 'ml-2' }, [
-                h('p', { class: 'user-name' }, row.userName),
-                h('p', { class: 'email' }, row.userEmail)
-              ])
-            ])
-          }
-        },
-        {
-          prop: 'userGender',
-          label: '性别',
-          sortable: true,
-          formatter: (row) => row.userGender
-        },
-        { prop: 'userPhone', label: '手机号' },
-        {
-          prop: 'status',
-          label: '状态',
-          formatter: (row) => {
-            const statusConfig = getUserStatusConfig(row.status)
-            return h(ElTag, { type: statusConfig.type }, () => statusConfig.text)
-          }
-        },
-        {
-          prop: 'createTime',
-          label: '创建日期',
-          sortable: true
-        },
-        {
-          prop: 'operation',
-          label: '操作',
-          width: 120,
-          fixed: 'right', // 固定列
-          formatter: (row) =>
-            h('div', [
-              h(ArtButtonTable, {
-                type: 'edit',
-                onClick: () => showDialog('edit', row)
-              }),
-              h(ArtButtonTable, {
-                type: 'delete',
-                onClick: () => deleteUser(row)
-              })
-            ])
-        }
-      ]
-    },
-    // 数据处理
-    transform: {
-      // 数据转换器 - 替换头像
-      dataTransformer: (records) => {
-        // 类型守卫检查
-        if (!Array.isArray(records)) {
-          console.warn('数据转换器: 期望数组类型，实际收到:', typeof records)
-          return []
-        }
+    handleAdd,
+    handleEdit,
+    handleDel,
+    handleSetStatus,
+    handleSubmit,
+    handleResetPassword
+  } = useUser()
 
-        // 使用本地头像替换接口返回的头像
-        return records.map((item, index: number) => {
-          return {
-            ...item,
-            avatar: ACCOUNT_TABLE_DATA[index % ACCOUNT_TABLE_DATA.length].avatar
-          }
-        })
-      }
-    }
+  onMounted(() => {
+    treeLoading.value = true
+    getDataList()
+    getRoleOptions()
+    getDeptOptions()
   })
-
-  /**
-   * 搜索处理
-   * @param params 参数
-   */
-  const handleSearch = (params: Record<string, any>) => {
-    console.log(params)
-    // 搜索参数赋值
-    Object.assign(searchParams, params)
-    getData()
-  }
-
-  /**
-   * 显示用户弹窗
-   */
-  const showDialog = (type: DialogType, row?: UserListItem): void => {
-    console.log('打开弹窗:', { type, row })
-    dialogType.value = type
-    currentUserData.value = row || {}
-    nextTick(() => {
-      dialogVisible.value = true
-    })
-  }
-
-  /**
-   * 删除用户
-   */
-  const deleteUser = (row: UserListItem): void => {
-    console.log('删除用户:', row)
-    ElMessageBox.confirm(`确定要注销该用户吗？`, '注销用户', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'error'
-    }).then(() => {
-      ElMessage.success('注销成功')
-    })
-  }
-
-  /**
-   * 处理弹窗提交事件
-   */
-  const handleDialogSubmit = async () => {
-    try {
-      dialogVisible.value = false
-      currentUserData.value = {}
-    } catch (error) {
-      console.error('提交失败:', error)
-    }
-  }
-
-  /**
-   * 处理表格行选择变化
-   */
-  const handleSelectionChange = (selection: UserListItem[]): void => {
-    selectedRows.value = selection
-    console.log('选中行数据:', selectedRows.value)
-  }
 </script>
+
+<template>
+  <div class="user-page art-full-height">
+    <div class="box-border flex gap-4 h-full max-md:block max-md:gap-0 max-md:h-auto">
+      <div class="flex-shrink-0 w-58 h-full max-md:w-full max-md:h-auto max-md:mb-5">
+        <DeptTree :tree-data="treeData" :tree-loading="treeLoading" @tree-select="onTreeSelect" />
+      </div>
+      <div class="flex flex-col flex-grow min-w-0">
+        <!-- 搜索栏 -->
+        <UserSearch
+          v-show="showSearchBar"
+          v-model="searchParams"
+          :role-options="roleOptions"
+          @reset="handleReset"
+          @search="handleSearch"
+        />
+
+        <!-- 列表 -->
+        <ElCard
+          class="flex flex-col flex-1 art-table-card"
+          shadow="never"
+          :style="{ 'margin-top': showSearchBar ? '12px' : '0' }"
+        >
+          <!-- 表格头部 -->
+          <ArtTableHeader
+            v-model:showSearchBar="showSearchBar"
+            v-model:columns="columnChecks"
+            title="用户列表"
+            :loading="loading"
+            @refresh="getDataList"
+          >
+            <template #buttons>
+              <ElButton type="primary" :icon="Plus" v-ripple @click="handleAdd">新增</ElButton>
+            </template>
+          </ArtTableHeader>
+
+          <!-- 表格 -->
+          <ArtTable
+            ref="tableRef"
+            rowKey="id"
+            :loading="loading"
+            :columns="columns"
+            :data="dataList"
+            :pagination="pagination"
+            @pagination:size-change="handleSizeChange"
+            @pagination:current-change="handleCurrentChange"
+          >
+            <template #gender="{ row }">
+              <ElTag v-if="row.gender === 1" color="#1D84FF">
+                <span class="text-white">男</span>
+              </ElTag>
+              <ElTag v-else-if="row.gender === 2" color="#FF80C8">
+                <span class="text-white">女</span>
+              </ElTag>
+              <ElTag v-else effect="dark" type="info">未知</ElTag>
+            </template>
+            <template #status="{ row }">
+              <ElSwitch
+                v-model="row.status"
+                :active-value="1"
+                :inactive-value="0"
+                active-text="正常"
+                inactive-text="冻结"
+                inline-prompt
+                @change="() => handleSetStatus(row)"
+              />
+            </template>
+            <template #operation="{ row }">
+              <ArtButtonTable type="edit" @click="handleEdit(row)" />
+              <ArtButtonTable type="delete" @click="handleDel(row)" />
+              <ArtButtonMore>
+                <ArtButtonMoreItem
+                  label="重置密码"
+                  value="resetPassword"
+                  icon="ep:lock"
+                  @click="handleResetPassword(row)"
+                />
+              </ArtButtonMore>
+            </template>
+          </ArtTable>
+        </ElCard>
+      </div>
+    </div>
+
+    <UserDialog
+      :visible="dialogVisible"
+      :type="dialogType"
+      :info="dialogInfo"
+      :dept-options="deptOptions"
+      :role-options="roleOptions"
+      @cancel="dialogVisible = false"
+      @submit="handleSubmit"
+    />
+  </div>
+</template>

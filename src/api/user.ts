@@ -5,8 +5,8 @@ import request from '@/utils/http'
  * @param params 查询参数
  * @returns 用户列表
  */
-export function fetchGetUserList(params: Api.SystemManage.UserSearchParams) {
-  return request.get<Api.SystemManage.UserList>({
+export function fetchGetUserList(params?: object) {
+  return request.get<any>({
     url: '/api/system/user/list',
     params
   })
@@ -23,5 +23,40 @@ export function fetchGetSelfInfo() {
     // headers: {
     //   'X-Custom-Header': 'your-custom-value'
     // }
+  })
+}
+
+export function fetchAddUser(params: object) {
+  return request.post<any>({
+    url: '/api/system/user/add',
+    params
+  })
+}
+
+export function fetchEditUser(params: object) {
+  return request.post<any>({
+    url: '/api/system/user/edit',
+    params
+  })
+}
+
+export function fetchDelUser(params: object) {
+  return request.post<any>({
+    url: '/api/system/user/del',
+    params
+  })
+}
+
+export function fetchSetStatus(params: object) {
+  return request.post<any>({
+    url: '/api/system/user/setStatus',
+    params
+  })
+}
+
+export function fetchResetPassword(params: object) {
+  return request.post<any>({
+    url: '/api/system/user/resetPassword',
+    params
   })
 }
