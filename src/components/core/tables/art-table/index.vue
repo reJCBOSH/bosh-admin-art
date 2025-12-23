@@ -35,14 +35,16 @@
             </slot>
           </template>
           <template v-if="col.useSlot && col.prop" #default="slotScope">
-            <slot
-              :name="col.slotName || col.prop"
-              v-bind="{
-                ...slotScope,
-                prop: col.prop,
-                value: col.prop ? slotScope.row[col.prop] : undefined
-              }"
-            />
+            <div :class="{ 'operation-cell': col.slotName || col.prop === 'operation' }">
+              <slot
+                :name="col.slotName || col.prop"
+                v-bind="{
+                  ...slotScope,
+                  prop: col.prop,
+                  value: col.prop ? slotScope.row[col.prop] : undefined
+                }"
+              />
+            </div>
           </template>
         </ElTableColumn>
       </template>

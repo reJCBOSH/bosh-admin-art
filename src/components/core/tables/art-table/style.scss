@@ -28,6 +28,19 @@
     }
   }
 
+  // 操作栏样式 - 按钮居中且间距4px
+  :deep(.operation-cell) {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px; // 确保最小高度，防止内容被裁剪
+
+    .el-button {
+      margin: 0; // 重置按钮默认外边距，使用gap控制间距
+    }
+  }
+
   .pagination {
     display: flex;
     margin-top: 13px;
