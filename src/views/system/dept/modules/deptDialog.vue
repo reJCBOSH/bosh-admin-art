@@ -79,7 +79,9 @@
           formData.value = cloneDeep(props.info)
         }
       } else {
-        formData.value = {}
+        setTimeout(() => {
+          formData.value = {}
+        }, 100)
       }
     },
     { immediate: true }

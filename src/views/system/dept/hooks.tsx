@@ -96,14 +96,9 @@ export function useDept() {
 
   function handleDel(row) {
     ElMessageBox.confirm(
-      `此操作将永久删除<strong style="color: var(--el-color-danger)">【${row.deptName}】</strong>部门, 是否继续?`,
-      '提示',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'error',
-        dangerouslyUseHTMLString: true
-      }
+      `确认<strong style="color: var(--art-danger)">删除</strong>部门<strong style="color: var(--el-color-danger)">【${row.deptName}】</strong>吗?`,
+      '系统提示',
+      { type: 'error', dangerouslyUseHTMLString: true }
     ).then(() => {
       fetchDelDept({ id: row.id }).then(() => {
         ElMessage.success('删除成功')
