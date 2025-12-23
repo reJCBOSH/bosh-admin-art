@@ -33,8 +33,8 @@
   const formItems = computed(() => {
     if (formData.value.menuType === 0) {
       return [
-        { label: '菜单类型', prop: 'menuType', span: 24 },
-        { label: '上级菜单', prop: 'parentId', span: 24 },
+        { label: '菜单类型', prop: 'menuType', slot: 'menuType', span: 24 },
+        { label: '上级菜单', prop: 'parentId', slot: 'parentId', span: 24 },
         { label: '菜单名称', prop: 'title' },
         { label: '路由名称', prop: 'name', tooltip: '必须保持唯一' },
         {
@@ -61,7 +61,7 @@
           label: '显示顺序',
           prop: 'displayOrder',
           type: 'number',
-          props: { min: 0, max: 9999, precision: 0, style: { width: '100%' } }
+          fieldProps: { min: 0, max: 9999, precision: 0, style: { width: '100%' } }
         },
         { label: '页面缓存', prop: 'keepAlive', type: 'switch', span: switchSpan },
         { label: '隐藏菜单', prop: 'isHide', type: 'switch', span: switchSpan },
@@ -71,8 +71,8 @@
       ]
     } else if (formData.value.menuType === 1) {
       return [
-        { label: '菜单类型', prop: 'menuType', span: 24 },
-        { label: '上级菜单', prop: 'parentId', span: 24 },
+        { label: '菜单类型', prop: 'menuType', slot: 'menuType', span: 24 },
+        { label: '上级菜单', prop: 'parentId', slot: 'parentId', span: 24 },
         { label: '菜单名称', prop: 'title' },
         { label: '路由名称', prop: 'name', tooltip: '必须保持唯一' },
         { label: '图标', prop: 'icon' },
@@ -82,7 +82,7 @@
           label: '显示顺序',
           prop: 'displayOrder',
           type: 'number',
-          props: { min: 0, max: 9999, precision: 0, style: { width: '100%' } }
+          fieldProps: { min: 0, max: 9999, precision: 0, style: { width: '100%' } }
         },
         { label: '页面缓存', prop: 'keepAlive', type: 'switch', span: switchSpan },
         { label: '隐藏菜单', prop: 'isHide', type: 'switch', span: switchSpan },
@@ -92,8 +92,8 @@
       ]
     } else if (formData.value.menuType === 2) {
       return [
-        { label: '菜单类型', prop: 'menuType', span: 24 },
-        { label: '上级菜单', prop: 'parentId', span: 24 },
+        { label: '菜单类型', prop: 'menuType', slot: 'menuType', span: 24 },
+        { label: '上级菜单', prop: 'parentId', slot: 'parentId', span: 24 },
         { label: '菜单名称', prop: 'title' },
         { label: '路由名称', prop: 'name', tooltip: '必须保持唯一' },
         { label: '图标', prop: 'icon' },
@@ -103,22 +103,22 @@
           label: '显示顺序',
           prop: 'displayOrder',
           type: 'number',
-          props: { min: 0, max: 9999, precision: 0, style: { width: '100%' } }
+          fieldProps: { min: 0, max: 9999, precision: 0, style: { width: '100%' } }
         },
         { label: '隐藏菜单', prop: 'isHide', type: 'switch', span: switchSpan },
         { label: '显示徽章', prop: 'showBadge', type: 'switch', span: switchSpan }
       ]
     } else {
       return [
-        { label: '菜单类型', prop: 'menuType', span: 24 },
-        { label: '上级菜单', prop: 'parentId', span: 24 },
+        { label: '菜单类型', prop: 'menuType', slot: 'menuType', span: 24 },
+        { label: '上级菜单', prop: 'parentId', slot: 'parentId', span: 24 },
         { label: '菜单名称', prop: 'title' },
         { label: '权限标识', prop: 'authMark' },
         {
           label: '显示顺序',
           prop: 'displayOrder',
           type: 'number',
-          props: { min: 0, max: 9999, precision: 0, style: { width: '100%' } }
+          fieldProps: { min: 0, max: 9999, precision: 0, style: { width: '100%' } }
         }
       ]
     }

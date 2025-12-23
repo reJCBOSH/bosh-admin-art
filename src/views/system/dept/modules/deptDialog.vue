@@ -35,7 +35,7 @@
         label: '部门编码',
         prop: 'deptCode',
         tooltip: '部门编码唯一',
-        props: {
+        fieldProps: {
           disabled: props.type === 'edit'
         }
       },
@@ -52,14 +52,14 @@
         label: '显示顺序',
         prop: 'displayOrder',
         type: 'number',
-        props: { min: 0, max: 9999, precision: 0, style: { width: '100%' } }
+        fieldProps: { min: 0, max: 9999, precision: 0, style: { width: '100%' } }
       },
       {
         label: '备注',
         prop: 'remark',
         type: 'input',
         span: 24,
-        props: { type: 'textarea', rows: 2, maxlength: 200, showWordLimit: true }
+        fieldProps: { type: 'textarea', rows: 2, maxlength: 200, showWordLimit: true }
       }
     ]
   }

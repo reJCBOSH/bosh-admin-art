@@ -1,52 +1,81 @@
+<!-- 表单组件 -->
+<!-- 支持常用表单组件、自定义组件、插槽、校验、隐藏表单项 -->
+<!-- 写法同 ElementPlus 官方文档组件，把属性写在 props 里面就可以了 -->
 <template>
   <section class="px-4 pb-0 pt-4 md:px-4 md:pt-4">
     <ElForm
       ref="formRef"
       :model="modelValue"
       :label-position="labelPosition"
-      :label-width="labelWidth"
       v-bind="{ ...$attrs }"
     >
       <ElRow class="flex flex-wrap" :gutter="gutter">
-        <template v-for="(item, index) in visibleItems" :key="index">
-          <ElCol
-            :xs="getColSpan(item.span, 'xs')"
-            :sm="getColSpan(item.span, 'sm')"
-            :md="getColSpan(item.span, 'md')"
-            :lg="getColSpan(item.span, 'lg')"
-            :xl="getColSpan(item.span, 'xl')"
+        <ElCol
+          v-for="item in visibleFormItems"
+          :key="item.prop"
+          :xs="getColSpan(item.span, 'xs')"
+          :sm="getColSpan(item.span, 'sm')"
+          :md="getColSpan(item.span, 'md')"
+          :lg="getColSpan(item.span, 'lg')"
+          :xl="getColSpan(item.span, 'xl')"
+        >
+          <ElFormItem
+            :prop="item.prop"
+            :label-width="item.label ? item.labelWidth || labelWidth : undefined"
           >
-            <ElFormItem
-              :prop="item.prop"
-              :label-width="item.label ? item.labelWidth || labelWidth : undefined"
-            >
-              <!-- 标签 -->
-              <template #label v-if="item.label">
-                <component v-if="typeof item.label !== 'string'" :is="item.label" />
-                <span v-else>
-                  <span v-if="item.tooltip" class="flex items-center">
-                    <span>{{ item.label }}</span>
-                    <ElTooltip :content="item.tooltip" placement="top">
-                      <ElIcon class="ml-0.5 cursor-help"><QuestionFilled /></ElIcon>
-                    </ElTooltip>
-                  </span>
-                  <span v-else>{{ item.label }}</span>
+            <template #label v-if="item.label">
+              <component v-if="typeof item.label !== 'string'" :is="item.label" />
+              <span v-else>
+                <span v-if="item.tooltip" class="flex items-center">
+                  <span>{{ item.label }}</span>
+                  <ElTooltip :content="item.tooltip" placement="top">
+                    <ElIcon class="ml-0.5 cursor-help"><QuestionFilled /></ElIcon>
+                  </ElTooltip>
                 </span>
-              </template>
+                <span v-else>{{ item.label }}</span>
+              </span>
+            </template>
+            <slot :name="item.prop" :item="item" :modelValue="modelValue">
+              <component
+                :is="getComponent(item)"
+                v-model="modelValue[item.prop]"
+                v-bind="getProps(item)"
+              >
+                <!-- 下拉选择 -->
+                <template v-if="item.type === 'select' && getProps(item)?.options">
+                  <ElOption
+                    v-for="option in getProps(item).options"
+                    v-bind="option"
+                    :key="option.value"
+                  />
+                </template>
 
-              <!-- 插槽优先 -->
-              <!-- 使用动态插槽名，优先使用item.slot，否则使用item.prop -->
-              <slot :name="item.slot || item.prop" :model="modelValue">
-                <!-- 默认内容：当插槽没有内容时，渲染动态组件 -->
-                <component
-                  :is="getComponent(item)"
-                  v-model="modelValue[item.prop]"
-                  v-bind="getFieldAttrs(item)"
-                />
-              </slot>
-            </ElFormItem>
-          </ElCol>
-        </template>
+                <!-- 复选框组 -->
+                <template v-if="item.type === 'checkboxgroup' && getProps(item)?.options">
+                  <ElCheckbox
+                    v-for="option in getProps(item).options"
+                    v-bind="option"
+                    :key="option.value"
+                  />
+                </template>
+
+                <!-- 单选框组 -->
+                <template v-if="item.type === 'radiogroup' && getProps(item)?.options">
+                  <ElRadio
+                    v-for="option in getProps(item).options"
+                    v-bind="option"
+                    :key="option.value"
+                  />
+                </template>
+
+                <!-- 动态插槽支持 -->
+                <template v-for="(slotFn, slotName) in getSlots(item)" :key="slotName" #[slotName]>
+                  <component :is="slotFn" />
+                </template>
+              </component>
+            </slot>
+          </ElFormItem>
+        </ElCol>
         <ElCol :xs="24" :sm="24" :md="span" :lg="span" :xl="span" class="max-w-full flex-1">
           <div
             class="mb-3 flex-c flex-wrap justify-end md:flex-row md:items-stretch md:gap-2"
@@ -122,12 +151,20 @@
     treeselect: ElTreeSelect // 树选择器
   }
 
+  const { width } = useWindowSize()
+  const { t } = useI18n()
+  const isMobile = computed(() => width.value < 500)
+
+  const formInstance = useTemplateRef<FormInstance>('formRef')
+
   // 表单项配置
   export interface FormItem {
     /** 表单项的唯一标识 */
     prop: string
     /** 表单项的标签文本或自定义渲染函数 */
     label: string | (() => VNode) | Component
+    /** 表单项的标签提示文本 */
+    tooltip?: string
     /** 表单项标签的宽度，会覆盖 Form 的 labelWidth */
     labelWidth?: string | number
     /** 表单项类型，支持预定义的组件类型 */
@@ -141,7 +178,7 @@
     /** 选项数据，用于 select、checkbox-group、radio-group 等 */
     options?: Record<string, any>
     /** 传递给表单项组件的属性 */
-    fieldProps?: Record<string, any>
+    props?: Record<string, any>
     /** 表单项的插槽配置 */
     slots?: Record<string, (() => any) | undefined>
     /** 表单项的占位符文本 */
@@ -183,21 +220,62 @@
     disabledSubmit: false
   })
 
-  const { width } = useWindowSize()
-  const { t } = useI18n()
-  const isMobile = computed(() => width.value < 500)
+  interface FormEmits {
+    reset: []
+    submit: []
+  }
+
+  const emit = defineEmits<FormEmits>()
 
   const modelValue = defineModel<Record<string, any>>({ default: {} })
-  const formInstance = useTemplateRef<FormInstance>('formRef')
 
-  /**
-   * 获取列宽 span 值
-   * 根据屏幕尺寸智能降级，避免小屏幕上表单项被压缩过小
-   */
-  const getColSpan = (itemSpan: number | undefined, breakpoint: ResponsiveBreakpoint): number => {
-    return calculateResponsiveSpan(itemSpan, props.span, breakpoint)
+  const rootProps = ['label', 'tooltip', 'labelWidth', 'prop', 'type', 'hidden', 'span', 'slots']
+
+  const getProps = (item: FormItem) => {
+    let props: any = {}
+
+    // 如果 item.props 不存在，则从 item 中复制非根属性
+    if (!item.props) {
+      const itemCopy = { ...item }
+      rootProps.forEach((prop) => delete (itemCopy as Record<string, any>)[prop])
+      props = { ...itemCopy }
+    } else {
+      props = { ...item.props }
+    }
+
+    // 如果没有显式设置 placeholder，并且 item.label 是字符串，则生成默认的 placeholder
+    if (!item.placeholder && typeof item.label === 'string') {
+      // 判断是否为选择类型组件
+      const selectTypes = ['select', 'checkboxgroup', 'radiogroup', 'cascader', 'treeselect']
+      if (selectTypes.includes(item.type as string)) {
+        // 选择类型组件使用专门的占位符
+        props.placeholder = `${t('table.searchBar.searchSelectPlaceholder')}${item.label}`
+      } else {
+        // 其他类型组件使用"请输入"+label的格式
+        props.placeholder = `${t('table.searchBar.searchInputPlaceholder')}${item.label}`
+      }
+    }
+
+    if (props.clearable === undefined) {
+      props.clearable = true
+    }
+
+    return props
   }
-  // 组件类型映射
+
+  // 获取插槽
+  const getSlots = (item: FormItem) => {
+    if (!item.slots) return {}
+    const validSlots: Record<string, () => any> = {}
+    Object.entries(item.slots).forEach(([prop, slotFn]) => {
+      if (slotFn) {
+        validSlots[prop] = slotFn
+      }
+    })
+    return validSlots
+  }
+
+  // 组件
   const getComponent = (item: FormItem) => {
     // 优先使用 render 函数或组件渲染自定义组件
     if (item.render) {
@@ -209,61 +287,19 @@
   }
 
   /**
-   * 可见的表单项
+   * 获取列宽 span 值
+   * 根据屏幕尺寸智能降级，避免小屏幕上表单项被压缩过小
    */
-  const visibleItems = computed(() => {
-    return props.items.filter((item) => !item.hidden)
-  })
+  const getColSpan = (itemSpan: number | undefined, breakpoint: ResponsiveBreakpoint): number => {
+    return calculateResponsiveSpan(itemSpan, span.value, breakpoint)
+  }
 
   /**
-   * 处理表单项配置，设置默认值
+   * 可见的表单项
    */
-  const getFieldAttrs = (item: FormItem) => {
-    let attrs: Record<string, any> = {}
-    // 深拷贝避免修改原始对象
-    const processedItem = { ...item }
-
-    // 初始化 fieldProps 如果不存在
-    if (processedItem.fieldProps) {
-      attrs = { ...processedItem.fieldProps }
-    }
-
-    // 处理 clearable 属性默认值
-    if (attrs.clearable === undefined) {
-      attrs.clearable = true
-    }
-
-    // 处理 placeholder 属性默认值
-    if (!attrs.placeholder) {
-      if (processedItem.placeholder) {
-        attrs.placeholder = processedItem.placeholder
-      } else {
-        if (typeof processedItem.label === 'string') {
-          // 判断是否为选择类型组件
-          const isSelectType = [
-            'select',
-            'checkboxgroup',
-            'radiogroup',
-            'cascader',
-            'treeselect'
-          ].includes(processedItem.type as string)
-
-          // 根据组件类型设置不同的默认 placeholder
-          const placeholderText = isSelectType
-            ? `${t('table.searchBar.searchSelectPlaceholder')}${processedItem.label}`
-            : `${t('table.searchBar.searchInputPlaceholder')}${processedItem.label}`
-
-          attrs.placeholder = placeholderText
-        }
-      }
-    }
-
-    if (processedItem.options) {
-      attrs.options = processedItem.options
-    }
-
-    return attrs
-  }
+  const visibleFormItems = computed(() => {
+    return props.items.filter((item) => !item.hidden)
+  })
 
   /**
    * 操作按钮样式
@@ -277,22 +313,8 @@
   }))
 
   /**
-   * 清理搜索参数，移除空字符串、null 和 undefined 字段
+   * 处理重置事件
    */
-  const cleanSearchParams = (params: Record<string, any>) => {
-    const cleaned = { ...params }
-    Object.keys(cleaned).forEach((key) => {
-      const value = cleaned[key]
-      if (value === '' || value === null || value === undefined) {
-        delete cleaned[key]
-      }
-    })
-    return cleaned
-  }
-
-  // 定义事件
-  const emit = defineEmits(['reset', 'submit'])
-
   const handleReset = () => {
     // 重置表单字段（UI 层）
     formInstance.value?.resetFields()
@@ -303,23 +325,14 @@
       Object.fromEntries(props.items.map(({ prop }) => [prop, undefined]))
     )
 
+    // 触发 reset 事件
     emit('reset')
   }
 
+  /**
+   * 处理提交事件
+   */
   const handleSubmit = () => {
-    // 根据 cleanParams 属性决定是否清理参数
-    if (props.cleanParams) {
-      const cleanedParams = cleanSearchParams(modelValue.value)
-      // 直接更新 modelValue
-      Object.keys(modelValue.value).forEach((key) => {
-        if (!(key in cleanedParams)) {
-          delete modelValue.value[key]
-        }
-      })
-
-      Object.assign(modelValue.value, cleanedParams)
-    }
-
     emit('submit')
   }
 
