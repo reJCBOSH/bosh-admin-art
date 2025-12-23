@@ -96,7 +96,7 @@ export function useDept() {
 
   function handleDel(row) {
     ElMessageBox.confirm(
-      `确认<strong style="color: var(--art-danger)">删除</strong>部门<strong style="color: var(--el-color-danger)">【${row.deptName}】</strong>吗?`,
+      `确认<strong style="color: var(--art-danger)">删除</strong>部门<strong style="color: var(--art-danger)">【${row.deptName}】</strong>吗?`,
       '系统提示',
       { type: 'error', dangerouslyUseHTMLString: true }
     ).then(() => {
