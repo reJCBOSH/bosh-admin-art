@@ -13,7 +13,7 @@
       </div>
     </div>
 
-    <div class="flex-c md:justify-end max-md:mt-3 max-sm:!hidden">
+    <div class="flex-c md:justify-end max-md:mt-3 max-sm:!hidden gap-2">
       <div
         v-if="showSearchBar != null"
         class="button"
@@ -378,7 +378,6 @@
     dark:bg-g-300/40
     text-g-700  
     hover:bg-g-300 
-    md:ml-0 
-    md:mr-2.5;
+    md:ml-0;
   }
 </style>
