@@ -12,7 +12,7 @@ export function useMenu() {
   const dataList = ref([])
   const { columns, columnChecks } = useTableColumns(() => [
     { label: 'ID', prop: 'id', fixed: 'left' },
-    { label: '菜单名称', prop: 'title' },
+    { label: '菜单名称', prop: 'title', useSlot: true },
     { label: '菜单类型', prop: 'menuType', width: 100, align: 'center', useSlot: true },
     { label: '路由名称', prop: 'name' },
     { label: '路由路径', prop: 'path' },
@@ -120,14 +120,9 @@ export function useMenu() {
 
   function handleDel(row) {
     ElMessageBox.confirm(
-      `此操作将永久删除菜单<strong style="color: var(--el-color-danger)">【${row.title}】</strong>, 是否继续?`,
-      '提示',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'error',
-        dangerouslyUseHTMLString: true
-      }
+      `确认<strong style="color: var(--art-danger)">删除</strong>菜单<strong style="color: var(--art-primary)">【${row.title}】</strong>吗?`,
+      '系统提示',
+      { type: 'error', dangerouslyUseHTMLString: true }
     ).then(() => {
       fetchDelMenu({ id: row.id }).then(() => {
         ElMessage.success('删除成功')

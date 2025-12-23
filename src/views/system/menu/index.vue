@@ -78,6 +78,12 @@
       </ArtTableHeader>
       <!-- 表格主体 -->
       <ArtTable ref="tableRef" rowKey="id" :loading="loading" :columns="columns" :data="dataList">
+        <template #title="{ row }">
+          <div class="flex-c gap-1">
+            <ArtSvgIcon :icon="row.icon" class="text-lg" />
+            <span>{{ row.title }}</span>
+          </div>
+        </template>
         <template #menuType="{ row }">
           <ElTag :type="getMenuTypeTag(row)">{{ getMenuTypeText(row) }}</ElTag>
         </template>
