@@ -243,6 +243,10 @@ html.dark .el-card {
   }
 }
 
+.el-drawer__header {
+  margin-bottom: 0 !important;
+}
+
 // 修改el-tag样式
 .el-tag {
   font-weight: 500;
