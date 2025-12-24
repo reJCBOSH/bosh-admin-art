@@ -4,7 +4,8 @@ import {
   fetchGetUserList,
   fetchSetStatus,
   fetchAddUser,
-  fetchEditUser
+  fetchEditUser,
+  fetchResetPassword
 } from '@/api/user'
 import { fetchGetDeptList } from '@/api/dept'
 import { useTableColumns } from '@/hooks/core/useTableColumns'
