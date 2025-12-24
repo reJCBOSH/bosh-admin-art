@@ -11,5 +11,10 @@
   "i18n-ally.namespace": true,
   "vscodeCustomCodeColor.highlightValue": ["v-loading", "v-auth", "v-ripple"],
   "typescript.validate.enable": false,
-  "javascript.validate.enable": false
+  "javascript.validate.enable": false,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true,
+  "editor.formatOnSave": true
 }
