@@ -1,12 +1,11 @@
 <script setup lang="ts">
-  import { ElSwitch } from 'element-plus'
   import { useRole } from './hooks'
   import RoleSearch from './modules/roleSearch.vue'
   import RoleDialog from './modules/roleDialog.vue'
   import RoleMenuDrawer from './modules/roleMenuDrawer.vue'
+  import RoleDataDrawer from './modules/roleDataDrawer.vue'
 
   import { Plus } from '@element-plus/icons-vue'
-  import RoleDataDrawer from './modules/roleDataDrawer.vue'
 
   defineOptions({ name: 'RoleList' })
 
