@@ -1,0 +1,34 @@
+{
+  "Search.vue快速生成模版": {
+    "prefix": "Search",
+    "body": [
+      "<script setup lang=\"ts\">",
+      "  defineOptions({ name: 'XXXSearch' })",
+      "",
+      "  const props = defineProps({",
+      "    modelValue: {",
+      "      type: Object,",
+      "      default: () => ({})",
+      "    }",
+      "  })",
+      "  const emit = defineEmits(['reset', 'search'])",
+      "",
+      "  const searchBarRef = ref()",
+      "  const searchParams = computed(() => props.modelValue)",
+      "  const searchItems = []",
+      "</script>",
+      "",
+      "<template>",
+      "  <ArtSearchBar",
+      "    ref=\"searchBarRef\"",
+      "    v-model=\"searchParams\"",
+      "    :items=\"searchItems\"",
+      "    @reset=\"emit('reset')\"",
+      "    @search=\"emit('search')\"",
+      "  />",
+      "</template>",
+      ""
+    ],
+    "description": "Search.vue快速生成模版"
+  }
+}
