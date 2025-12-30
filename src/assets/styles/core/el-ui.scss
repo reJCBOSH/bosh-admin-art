@@ -494,6 +494,11 @@ html.dark .el-card {
   }
 }
 
+.el-picker-panel__icon-btn {
+  line-height: 1;
+  padding: 1px 6px;
+}
+
 // 优化树型菜单样式
 .el-tree-node__content {
   border-radius: 4px;
