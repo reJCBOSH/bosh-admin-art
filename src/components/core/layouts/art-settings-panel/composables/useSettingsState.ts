@@ -7,6 +7,16 @@ import { MenuThemeEnum, MenuTypeEnum } from '@/enums/appEnum'
 export function useSettingsState() {
   const settingStore = useSettingStore()
 
+  // 灰色模式初始化
+  const initColorGray = () => {
+    if (settingStore.colorGray) {
+      const el = document.getElementsByTagName('html')[0]
+      setTimeout(() => {
+        el.classList.add('color-gray')
+      }, 100)
+    }
+  }
+
   // 色弱模式初始化
   const initColorWeak = () => {
     if (settingStore.colorWeak) {
@@ -31,6 +41,7 @@ export function useSettingsState() {
 
   return {
     // 方法
+    initColorGray,
     initColorWeak,
     switchMenuLayouts
   }

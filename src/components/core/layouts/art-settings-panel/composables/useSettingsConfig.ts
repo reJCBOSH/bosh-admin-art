@@ -161,6 +161,13 @@ export function useSettingsConfig() {
         headerBarKey: null // 不依赖headerBar配置
       },
       {
+        key: 'colorGray',
+        label: t('setting.basics.list.grayMode'),
+        type: 'switch' as const,
+        handler: 'colorGray',
+        headerBarKey: null // 不依赖headerBar配置
+      },
+      {
         key: 'colorWeak',
         label: t('setting.basics.list.weakMode'),
         type: 'switch' as const,

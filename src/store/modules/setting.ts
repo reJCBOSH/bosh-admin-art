@@ -94,6 +94,8 @@ export const useSettingStore = defineStore(
     const autoClose = ref(SETTING_DEFAULT_CONFIG.autoClose)
     /** 是否唯一展开 */
     const uniqueOpened = ref(SETTING_DEFAULT_CONFIG.uniqueOpened)
+    /** 是否灰色模式 */
+    const colorGray = ref(SETTING_DEFAULT_CONFIG.colorGray)
     /** 是否色弱模式 */
     const colorWeak = ref(SETTING_DEFAULT_CONFIG.colorWeak)
     /** 是否刷新 */
@@ -283,6 +285,13 @@ export const useSettingStore = defineStore(
     }
 
     /**
+     * 切换灰色模式
+     */
+    const setColorGray = () => {
+      colorGray.value = !colorGray.value
+    }
+
+    /**
      * 切换色弱模式
      */
     const setColorWeak = () => {
@@ -392,6 +401,7 @@ export const useSettingStore = defineStore(
       showWorkTab,
       showLanguage,
       showNprogress,
+      colorGray,
       colorWeak,
       showSettingGuide,
       pageTransition,
@@ -426,6 +436,7 @@ export const useSettingStore = defineStore(
       setWorkTab,
       setLanguage,
       setNprogress,
+      setColorGray,
       setColorWeak,
       hideSettingGuide,
       openSettingGuide,

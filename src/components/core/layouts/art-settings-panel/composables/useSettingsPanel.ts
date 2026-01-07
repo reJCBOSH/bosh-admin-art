@@ -20,7 +20,7 @@ export function useSettingsPanel() {
   // Composables
   const { openFestival, cleanup } = useCeremony()
   const { setSystemTheme, setSystemAutoTheme } = useTheme()
-  const { initColorWeak } = useSettingsState()
+  const { initColorGray, initColorWeak } = useSettingsState()
   const { domOperations } = useSettingsHandlers()
 
   // 响应式状态
@@ -156,6 +156,7 @@ export function useSettingsPanel() {
       mittBus.on('openSetting', openSetting)
       themeHandlers.initSystemColor()
       themeCleanup = themeHandlers.listenerSystemTheme()
+      initColorGray()
       initColorWeak()
 
       // 设置盒子模式

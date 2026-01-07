@@ -38,6 +38,12 @@
   --tw-backdrop-sepia: ;
 }
 
+// 灰色模式
+.color-gray {
+  filter: grayscale(100%);
+  -webkit-filter: grayscale(100%);
+}
+
 // 色弱模式
 .color-weak {
   filter: invert(80%);

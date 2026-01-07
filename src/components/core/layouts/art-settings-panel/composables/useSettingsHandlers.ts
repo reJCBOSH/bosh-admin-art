@@ -84,6 +84,14 @@ export function useSettingsHandlers() {
     // 显示进度条
     nprogress: createToggleHandler(() => settingStore.setNprogress()),
 
+    // 灰色模式
+    colorGray: createToggleHandler(
+      () => settingStore.setColorGray(),
+      () => {
+        domOperations.setHtmlClass('color-gray', settingStore.colorGray)
+      }
+    ),
+
     // 色弱模式
     colorWeak: createToggleHandler(
       () => settingStore.setColorWeak(),

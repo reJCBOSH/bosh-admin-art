@@ -81,6 +81,7 @@
     { comment: '是否显示水印', key: 'watermarkVisible' },
     { comment: '是否自动关闭', key: 'autoClose' },
     { comment: '是否唯一展开', key: 'uniqueOpened' },
+    { comment: '是否灰色模式', key: 'colorGray' },
     { comment: '是否色弱模式', key: 'colorWeak' },
     { comment: '是否刷新', key: 'refresh' },
     { comment: '是否加载节日烟花', key: 'holidayFireworksLoaded' },
@@ -211,6 +212,7 @@
       toggleIfDifferent(settingStore.uniqueOpened, config.uniqueOpened, () =>
         settingStore.setUniqueOpened()
       )
+      toggleIfDifferent(settingStore.colorGray, config.colorGray, () => settingStore.setColorGray())
       toggleIfDifferent(settingStore.colorWeak, config.colorWeak, () => settingStore.setColorWeak())
 
       // 样式设置

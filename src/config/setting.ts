@@ -67,6 +67,8 @@ export const SETTING_DEFAULT_CONFIG = {
   autoClose: false,
   /** 是否唯一展开 */
   uniqueOpened: true,
+  /** 是否灰色模式 */
+  colorGray: false,
   /** 是否色弱模式 */
   colorWeak: false,
   /** 是否刷新 */

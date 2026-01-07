@@ -79,6 +79,7 @@
         "breadcrumb": "Show crumb navigation",
         "language": "Show multilingual selection",
         "progressBar": "Show top progress bar",
+        "grayMode": "Color Gray Mode",
         "weakMode": "Color Weakness Mode",
         "watermark": "Global watermark",
         "menuWidth": "Menu width",
