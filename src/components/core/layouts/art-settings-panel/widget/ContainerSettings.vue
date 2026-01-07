@@ -1,11 +1,11 @@
 <template>
   <div>
-    <SectionTitle :title="$t('setting.container.title')" class="mt-12.5" />
+    <SectionTitle :title="$t('setting.container.title')" class="mt-10" />
     <div class="flex">
       <div
         v-for="option in containerWidthOptions"
         :key="option.value"
-        class="flex-cc flex-1 h-16 mt-5 mr-3.5 mb-3.5 cursor-pointer !border-2 rounded-lg !text-g-800 last:mr-0"
+        class="flex-cc flex-1 h-16 mr-3.5 mb-2.5 cursor-pointer !border-2 rounded-lg !text-g-800 last:mr-0"
         :class="{
           'border-theme [&_i]:!text-theme': containerWidth === option.value,
           'border-full-d': containerWidth !== option.value

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <SectionTitle :title="$t('setting.basics.title')" class="mt-10" />
+    <SectionTitle :title="$t('setting.basics.title')" />
     <SettingItem
       v-for="config in basicSettingsConfig"
       :key="config.key"
