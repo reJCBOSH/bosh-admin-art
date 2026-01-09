@@ -20,20 +20,29 @@
           >
             <ElFormItem prop="username">
               <ElInput
+                v-model.trim="formData.username"
+                clearable
                 class="custom-height"
                 :placeholder="$t('login.placeholder.username')"
-                v-model.trim="formData.username"
-              />
+              >
+                <template #prefix>
+                  <ArtSvgIcon icon="ri:user-3-fill" />
+                </template>
+              </ElInput>
             </ElFormItem>
             <ElFormItem prop="password">
               <ElInput
-                class="custom-height"
-                :placeholder="$t('login.placeholder.password')"
                 v-model.trim="formData.password"
+                class="custom-height mt-2"
+                :placeholder="$t('login.placeholder.password')"
                 type="password"
                 autocomplete="off"
                 show-password
-              />
+              >
+                <template #prefix>
+                  <ArtSvgIcon icon="ri:lock-fill" />
+                </template>
+              </ElInput>
             </ElFormItem>
 
             <!-- 推拽验证 -->
@@ -73,6 +82,7 @@
                 type="primary"
                 @click="handleSubmit"
                 :loading="loading"
+                auto-insert-space
                 v-ripple
               >
                 {{ $t('login.btnText') }}
@@ -140,42 +150,44 @@
 
   // 登录
   const handleSubmit = async () => {
-    if (!formRef.value) return
+    formRef.value?.validate(async (valid) => {
+      if (valid) {
+        try {
+          loading.value = true
+          const { username, password } = formData
+          const { accessToken, refreshToken, expiresAt } = await fetchLogin({
+            username,
+            password
+          })
+          if (!accessToken) {
+            throw new Error('Login failed - no token received')
+          }
 
-    try {
-      loading.value = true
-      const { username, password } = formData
-      const { accessToken, refreshToken, expiresAt } = await fetchLogin({
-        username,
-        password
-      })
-      if (!accessToken) {
-        throw new Error('Login failed - no token received')
+          // 存储 token 和登录状态
+          userStore.setToken(accessToken, refreshToken, expiresAt)
+          userStore.setLoginStatus(true)
+
+          // 登录成功处理
+          showLoginSuccessNotice()
+
+          // 获取 redirect 参数，如果存在则跳转到指定页面，否则跳转到首页
+          const redirect = route.query.redirect as string
+          router.push(redirect || '/')
+        } catch (error) {
+          // 处理 HttpError
+          if (error instanceof HttpError) {
+            // console.log(error.code)
+          } else {
+            // 处理非 HttpError
+            // ElMessage.error('登录失败，请稍后重试')
+            console.error('[Login] Unexpected error:', error)
+          }
+        } finally {
+          loading.value = false
+          resetDragVerify()
+        }
       }
-
-      // 存储 token 和登录状态
-      userStore.setToken(accessToken, refreshToken, expiresAt)
-      userStore.setLoginStatus(true)
-
-      // 登录成功处理
-      showLoginSuccessNotice()
-
-      // 获取 redirect 参数，如果存在则跳转到指定页面，否则跳转到首页
-      const redirect = route.query.redirect as string
-      router.push(redirect || '/')
-    } catch (error) {
-      // 处理 HttpError
-      if (error instanceof HttpError) {
-        // console.log(error.code)
-      } else {
-        // 处理非 HttpError
-        // ElMessage.error('登录失败，请稍后重试')
-        console.error('[Login] Unexpected error:', error)
-      }
-    } finally {
-      loading.value = false
-      resetDragVerify()
-    }
+    })
   }
 
   // 重置拖拽验证
