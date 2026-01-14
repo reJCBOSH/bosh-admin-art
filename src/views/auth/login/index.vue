@@ -104,6 +104,8 @@
   import { fetchLogin } from '@/api/auth'
   import { ElNotification, type FormInstance, type FormRules } from 'element-plus'
   import { useSettingStore } from '@/store/modules/setting'
+  import { fetchPublicKeyGet } from '@/api/basic'
+  import { JSEncrypt } from 'jsencrypt'
 
   defineOptions({ name: 'Login' })
 
@@ -115,6 +117,10 @@
   // 监听语言切换，重置表单
   watch(locale, () => {
     formKey.value++
+  })
+
+  onMounted(() => {
+    getPublicKey()
   })
 
   export interface Account {
@@ -131,6 +137,7 @@
   const route = useRoute()
   const isPassing = ref(false)
   const isClickPass = ref(false)
+  const publicKey = ref('')
 
   const systemName = AppConfig.systemInfo.name
   const formRef = ref<FormInstance>()
@@ -148,16 +155,23 @@
 
   const loading = ref(false)
 
+  const getPublicKey = () => {
+    fetchPublicKeyGet().then((res) => {
+      publicKey.value = res
+    })
+  }
+
   // 登录
   const handleSubmit = async () => {
     formRef.value?.validate(async (valid) => {
       if (valid) {
         try {
           loading.value = true
-          const { username, password } = formData
+          const encrypt = new JSEncrypt()
+          encrypt.setPublicKey(publicKey.value)
           const { accessToken, refreshToken, expiresAt } = await fetchLogin({
-            username,
-            password
+            username: formData.username,
+            password: encrypt.encrypt(formData.password)
           })
           if (!accessToken) {
             throw new Error('Login failed - no token received')
