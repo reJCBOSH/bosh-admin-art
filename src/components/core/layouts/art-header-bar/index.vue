@@ -29,7 +29,7 @@
         <!-- 菜单按钮 -->
         <ArtIconButton
           v-if="isLeftMenu && shouldShowMenuButton"
-          icon="ri:menu-2-fill"
+          :icon="menuOpen ? 'ri:menu-fold-line' : 'ri:menu-unfold-line'"
           class="ml-3 max-sm:ml-[7px]"
           @click="visibleMenu"
         />
