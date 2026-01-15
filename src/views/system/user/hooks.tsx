@@ -189,7 +189,6 @@ export function useUser() {
   }
 
   return {
-    // 参数
     deptName,
     loading,
     showSearchBar,
@@ -206,7 +205,6 @@ export function useUser() {
     dialogType,
     dialogInfo,
     dialogVisible,
-    // 方法
     getDataList,
     getRoleOptions,
     getDeptOptions,
