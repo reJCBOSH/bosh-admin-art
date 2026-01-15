@@ -167,6 +167,9 @@
       if (valid) {
         try {
           loading.value = true
+          if (!publicKey.value) {
+            await getPublicKey()
+          }
           const encrypt = new JSEncrypt()
           encrypt.setPublicKey(publicKey.value)
           const { accessToken, refreshToken, expiresAt } = await fetchLogin({
