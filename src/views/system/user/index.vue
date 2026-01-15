@@ -14,7 +14,6 @@
   defineOptions({ name: 'UserList' })
 
   const {
-    // 参数
     loading,
     showSearchBar,
     searchParams,
@@ -30,7 +29,6 @@
     dialogVisible,
     dialogType,
     dialogInfo,
-    // 方法
     getDataList,
     getRoleOptions,
     getDeptOptions,

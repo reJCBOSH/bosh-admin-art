@@ -158,7 +158,6 @@ export function useRole() {
   }
 
   return {
-    // 参数
     showSearchBar,
     searchParams,
     tableRef,
@@ -174,7 +173,6 @@ export function useRole() {
     roleMenuVisible,
     roleDataVisible,
     dataAuthOptions,
-    // 方法
     getDataList,
     handleReset,
     handleSearch,

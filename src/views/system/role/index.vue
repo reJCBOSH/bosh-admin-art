@@ -10,7 +10,6 @@
   defineOptions({ name: 'RoleList' })
 
   const {
-    // 参数
     showSearchBar,
     searchParams,
     tableRef,
@@ -25,7 +24,6 @@
     currentRow,
     roleMenuVisible,
     roleDataVisible,
-    // 方法
     getDataList,
     handleReset,
     handleSearch,
