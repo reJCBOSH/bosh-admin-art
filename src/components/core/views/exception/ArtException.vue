@@ -38,6 +38,6 @@
   const { homePath } = useCommon()
 
   const backHome = () => {
-    router.push(homePath.value)
+    router.push(homePath.value || { name: 'Login' })
   }
 </script>
