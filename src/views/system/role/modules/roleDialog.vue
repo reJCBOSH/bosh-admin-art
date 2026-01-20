@@ -82,7 +82,7 @@
 <template>
   <ElDialog
     v-model="dialogVisible"
-    :title="dialogType === 'add' ? '新增角色' : '修改角色'"
+    :title="(dialogType === 'add' ? '新增' : '修改') + '角色'"
     width="800"
     align-center
     :close-on-click-modal="false"

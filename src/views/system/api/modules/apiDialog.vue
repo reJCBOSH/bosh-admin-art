@@ -55,10 +55,9 @@
       {
         label: '描述',
         prop: 'apiDesc',
-        span: 24,
         fieldProps: {
           type: 'textarea',
-          autosize: { minRows: 1, maxRows: 3 },
+          autosize: { minRows: 2 },
           maxlength: 200,
           showWordLimit: true
         }

@@ -2,15 +2,10 @@
   defineOptions({ name: 'UserSearch' })
 
   const props = defineProps({
-    modelValue: {
-      type: Object,
-      default: () => ({})
-    },
-    roleOptions: {
-      type: Array,
-      default: () => []
-    }
+    modelValue: { type: Object, default: () => ({}) },
+    roleOptions: { type: Array, default: () => [] }
   })
+
   const emit = defineEmits(['update:modelValue', 'reset', 'search'])
 
   // 表单数据双向绑定

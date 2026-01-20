@@ -91,7 +91,7 @@
 <template>
   <ElDialog
     v-model="dialogVisible"
-    :title="dialogType === 'add' ? '新增部门' : '修改部门'"
+    :title="(dialogType === 'add' ? '新增' : '修改') + '部门'"
     width="800"
     align-center
     :close-on-click-modal="false"

@@ -153,7 +153,7 @@
 <template>
   <ElDialog
     v-model="dialogVisible"
-    :title="dialogType === 'add' ? '新增菜单' : '修改菜单'"
+    :title="(dialogType === 'add' ? '新增' : '修改') + '菜单'"
     width="800"
     align-center
     :close-on-click-modal="false"

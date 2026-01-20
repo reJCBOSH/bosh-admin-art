@@ -2,11 +2,9 @@
   defineOptions({ name: 'MenuSearch' })
 
   const props = defineProps({
-    modelValue: {
-      type: Object,
-      default: () => ({})
-    }
+    modelValue: { type: Object, default: () => ({}) }
   })
+
   const emit = defineEmits(['reset', 'search'])
 
   const searchBarRef = ref()

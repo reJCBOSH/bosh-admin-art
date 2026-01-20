@@ -120,7 +120,7 @@
 <template>
   <ElDialog
     v-model="dialogVisible"
-    :title="dialogType === 'add' ? '新增用户' : '修改用户'"
+    :title="(dialogType === 'add' ? '新增' : '修改') + '用户'"
     width="800"
     align-center
     :close-on-click-modal="false"
@@ -133,7 +133,6 @@
       v-model="formData"
       :items="getFormItems()"
       :rules="rules"
-      label-width="100px"
       :show-reset="false"
       :show-submit="false"
     >
