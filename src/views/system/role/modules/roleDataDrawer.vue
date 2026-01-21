@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { cloneDeep, getKeyList, handleTree } from '@pureadmin/utils'
   import { fetchGetDeptList } from '@/api/dept'
-  import { fetchGetRoleDeptIds, fetchSetRoleDataAuth } from '@/api/role'
+  import { fetchGetRoleDeptIds, fetchSetRoleDataPerm } from '@/api/role'
   import { useRole } from '../hooks'
 
   defineOptions({
@@ -29,7 +29,7 @@
 
   const { dataAuthOptions } = useRole()
   const curRow = ref()
-  const dataAuth = ref()
+  const dataPerm = ref()
   const treeRef = ref()
   const treeHeight = ref(window.innerHeight - 168)
   const treeProps = {
@@ -42,16 +42,16 @@
 
   function handleRoleData() {
     let deptIds = []
-    if (dataAuth.value === 5) {
+    if (dataPerm.value === 5) {
       deptIds = treeRef.value.getCheckedKeys()
       if (deptIds.length === 0) {
         ElMessage.info('请选择部门权限')
         return
       }
     }
-    fetchSetRoleDataAuth({
+    fetchSetRoleDataPerm({
       roleId: curRow.value.id,
-      dataAuth: dataAuth.value,
+      dataPerm: dataPerm.value,
       deptIds
     }).then(() => {
       ElMessage.success(`设置${curRow.value.roleName}数据权限成功`)
@@ -67,7 +67,7 @@
       if (visible) {
         if (!curRow.value || (curRow.value && curRow.value.id !== props.row.id)) {
           curRow.value = cloneDeep(props.row)
-          dataAuth.value = curRow.value.dataAuth === 0 ? undefined : curRow.value.dataAuth
+          dataPerm.value = curRow.value.dataPerm === 0 ? undefined : curRow.value.dataPerm
           const { id } = curRow.value
           const res = Promise.all([fetchGetDeptList({ pageNo: -1 }), fetchGetRoleDeptIds({ id })])
           res.then(async ([deptData, roleDeptIds]) => {
@@ -109,7 +109,7 @@
       </div>
     </template>
     <ElDivider style="margin-top: 0" />
-    <ElSelect v-model="dataAuth" placeholder="请选择数据权限">
+    <ElSelect v-model="dataPerm" placeholder="请选择数据权限">
       <ElOption
         v-for="(item, index) in dataAuthOptions"
         :key="index"
@@ -118,7 +118,7 @@
       ></ElOption>
     </ElSelect>
     <ElTreeV2
-      v-if="dataAuth === 5"
+      v-if="dataPerm === 5"
       ref="treeRef"
       show-checkbox
       :data="treeData"

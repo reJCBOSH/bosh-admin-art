@@ -105,7 +105,7 @@
             />
             <ArtButtonMoreItem
               label="数据权限"
-              value="dataAuth"
+              value="dataPerm"
               icon="ri:database-2-line"
               @click="handleRoleData(row)"
             />

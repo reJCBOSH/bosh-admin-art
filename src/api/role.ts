@@ -70,9 +70,9 @@ export function fetchSetRoleMenuAuth(params: object) {
   })
 }
 
-export function fetchSetRoleDataAuth(params: object) {
+export function fetchSetRoleDataPerm(params: object) {
   return request.post<any>({
-    url: '/api/system/role/setDataAuth',
+    url: '/api/system/role/setDataPerm',
     params
   })
 }
