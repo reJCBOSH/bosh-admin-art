@@ -181,7 +181,15 @@ export const useUserStore = defineStore(
       resetRouterState(500)
       // 跳转到登录页，携带当前路由作为 redirect 参数
       const currentRoute = router.currentRoute.value
-      const redirect = currentRoute.path !== '/login' ? currentRoute.fullPath : undefined
+      const redirect = undefined
+      if (
+        currentRoute.path !== '/login' &&
+        currentRoute.path !== '/403' &&
+        currentRoute.path !== '/404' &&
+        currentRoute.path !== '/500'
+      ) {
+        redirect = currentRoute.fullPath
+      }
       router.push({
         name: 'Login',
         query: redirect ? { redirect } : undefined
