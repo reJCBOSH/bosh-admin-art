@@ -26,13 +26,13 @@
             src="@imgs/user/avatar.webp"
           />
           <div class="w-[calc(100%-60px)] h-full">
-            <span class="block text-sm font-medium text-g-800 truncate">{{
-              userInfo.userName
-            }}</span>
-            <span class="block mt-0.5 text-xs text-g-500 truncate">{{ userInfo.email }}</span>
+            <span class="block text-sm font-medium text-g-800 truncate">
+              {{ userInfo.nickname }}
+            </span>
+            <span class="block mt-0.5 text-xs text-g-500 truncate">{{ userInfo.username }}</span>
           </div>
         </div>
-        <ul class="py-4 mt-3 border-t border-g-300/80">
+        <ul class="py-3 mt-3 border-t border-g-300/80">
           <li class="btn-item" @click="goPage('/system/user-center')">
             <ArtSvgIcon icon="ri:user-3-line" />
             <span>{{ $t('topBar.user.userCenter') }}</span>
@@ -51,7 +51,8 @@
           </li>
           <div class="w-full h-px my-2 bg-g-300/80"></div>
           <div class="log-out c-p" @click="loginOut">
-            {{ $t('topBar.user.logout') }}
+            <ArtSvgIcon icon="ri:logout-box-line" class="text-lg" />
+            <span>{{ $t('topBar.user.logout') }}</span>
           </div>
         </ul>
       </div>
@@ -154,6 +155,9 @@
 
   .log-out {
     @apply py-1.5
+    flex
+    items-center
+    justify-center
     mt-5
     text-xs
     text-center
@@ -162,6 +166,6 @@
     rounded-md
     transition-all
     duration-200
-    hover:shadow-xl;
+    hover:shadow-lg;
   }
 </style>
