@@ -113,7 +113,7 @@
         <ArtIconButton
           v-if="shouldShowNotification"
           icon="ri:notification-2-line"
-          class="notice-button relative"
+          class="notice-btn relative"
           @click="visibleNotice"
         >
           <div class="absolute top-2 right-2 size-1.5 !bg-danger rounded-full"></div>
@@ -123,7 +123,7 @@
         <ArtIconButton
           v-if="shouldShowChat"
           icon="ri:message-3-line"
-          class="chat-button relative"
+          class="chat-btn relative"
           @click="openChat"
         >
           <div class="breathing-dot absolute top-2 right-2 size-1.5 !bg-success rounded-full"></div>
@@ -153,6 +153,7 @@
           v-if="shouldShowThemeToggle"
           @click="themeAnimation"
           :icon="isDark ? 'ri:sun-fill' : 'ri:moon-line'"
+          :class="isDark ? 'light-theme-btn' : 'dark-theme-btn'"
         />
 
         <!-- 用户头像、菜单 -->
@@ -457,11 +458,19 @@
     animation: shrink 0.6s forwards;
   }
 
-  .notice-button:hover :deep(.art-svg-icon) {
+  .notice-btn:hover :deep(.art-svg-icon) {
     animation: shake 0.5s ease-in-out;
   }
 
-  .chat-button:hover :deep(.art-svg-icon) {
+  .chat-btn:hover :deep(.art-svg-icon) {
+    animation: shake 0.5s ease-in-out;
+  }
+
+  .light-theme-btn:hover :deep(.art-svg-icon) {
+    animation: rotate180 0.5s;
+  }
+
+  .dark-theme-btn:hover :deep(.art-svg-icon) {
     animation: shake 0.5s ease-in-out;
   }
 
