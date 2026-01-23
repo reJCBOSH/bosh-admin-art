@@ -22,8 +22,8 @@ export function useLoginRecord() {
     { label: '操作系统', prop: 'loginOS' },
     { label: '浏览器', prop: 'loginBrowser' },
     { label: '登录状态', prop: 'loginStatus', align: 'center', useSlot: true },
-    { label: '登录时间', prop: 'loginTime', width: 170 },
-    { label: '操作', prop: 'operation', width: 120, align: 'center', fixed: 'right', useSlot: true }
+    { label: '登录时间', prop: 'loginTime', width: 180 },
+    { label: '操作', prop: 'operation', width: 80, align: 'center', fixed: 'right', useSlot: true }
   ])
   const pagination = ref({ current: 1, size: 10, total: 0 })
   const selectedRows = ref([])

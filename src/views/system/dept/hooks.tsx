@@ -12,7 +12,7 @@ export function useDept() {
   const treeList = ref([])
   const dataList = ref([])
   const { columns, columnChecks } = useTableColumns(() => [
-    { label: 'ID', prop: 'id', fixed: 'left' },
+    { label: 'ID', prop: 'id', width: 80, fixed: 'left' },
     { label: '部门名称', prop: 'deptName' },
     { label: '部门编码', prop: 'deptCode' },
     { label: '状态', prop: 'status', align: 'center', useSlot: true },

@@ -32,7 +32,7 @@ export function useOperationRecord() {
     { label: '请求地点', prop: 'requestRegion' },
     { label: '操作系统', prop: 'requestOS', width: 120 },
     { label: '浏览器', prop: 'requestBrowser' },
-    { label: '请求时间', prop: 'createdAt', width: 170 },
+    { label: '请求时间', prop: 'createdAt', width: 180 },
     { label: '操作', prop: 'operation', width: 120, align: 'center', fixed: 'right', useSlot: true }
   ])
   const pagination = ref({ current: 1, size: 10, total: 0 })

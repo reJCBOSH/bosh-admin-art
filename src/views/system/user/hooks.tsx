@@ -27,7 +27,7 @@ export function useUser() {
     { label: '角色', prop: 'roleName' },
     { label: '手机号', prop: 'mobile' },
     { label: '状态', prop: 'status', align: 'center', useSlot: true },
-    { label: '操作', prop: 'operation', width: 120, align: 'center', fixed: 'right', useSlot: true }
+    { label: '操作', prop: 'operation', width: 160, align: 'center', fixed: 'right', useSlot: true }
   ])
   const pagination = ref({
     current: 1,

@@ -11,7 +11,7 @@ export function useMenu() {
   const treeList = ref([])
   const dataList = ref([])
   const { columns, columnChecks } = useTableColumns(() => [
-    { label: 'ID', prop: 'id', fixed: 'left' },
+    { label: 'ID', prop: 'id', width: 80, fixed: 'left' },
     { label: '菜单名称', prop: 'title', useSlot: true },
     { label: '菜单类型', prop: 'menuType', width: 100, align: 'center', useSlot: true },
     { label: '路由名称', prop: 'name' },
