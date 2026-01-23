@@ -96,7 +96,6 @@
 </template>
 
 <script setup lang="ts">
-  import AppConfig from '@/config'
   import { useUserStore } from '@/store/modules/user'
   import { getCssVar } from '@/utils/ui'
   import { useI18n } from 'vue-i18n'
@@ -139,7 +138,6 @@
   const isClickPass = ref(false)
   const publicKey = ref('')
 
-  const systemName = AppConfig.systemInfo.name
   const formRef = ref<FormInstance>()
 
   const formData = reactive({
@@ -184,12 +182,14 @@
           userStore.setToken(accessToken, refreshToken, expiresAt)
           userStore.setLoginStatus(true)
 
-          // 登录成功处理
-          showLoginSuccessNotice()
-
           // 获取 redirect 参数，如果存在则跳转到指定页面，否则跳转到首页
           const redirect = route.query.redirect as string
-          router.push(redirect || '/')
+
+          // 等待路由加载完成后跳转页面
+          await router.push(redirect || '/')
+
+          // 登录成功处理
+          showLoginSuccessNotice()
         } catch (error) {
           // 处理 HttpError
           if (error instanceof HttpError) {
@@ -200,8 +200,8 @@
             console.error('[Login] Unexpected error:', error)
           }
         } finally {
-          loading.value = false
           resetDragVerify()
+          loading.value = false
         }
       }
     })
@@ -209,6 +209,7 @@
 
   // 重置拖拽验证
   const resetDragVerify = () => {
+    if (!dragVerify.value) return
     dragVerify.value.reset()
   }
 
@@ -220,7 +221,8 @@
         type: 'success',
         duration: 2500,
         zIndex: 10000,
-        message: `${t('login.success.message')}, ${systemName}!`
+        message: `${t('login.success.message')}, ${userStore.getUserInfo.nickname}!`,
+        offset: 50
       })
     }, 1000)
   }
