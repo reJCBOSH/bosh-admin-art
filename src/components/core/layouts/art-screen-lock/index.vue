@@ -86,7 +86,13 @@
             </ElInput>
           </ElFormItem>
 
-          <ElButton type="primary" class="w-full mt-2" @click="handleUnlock" v-ripple>
+          <ElButton
+            type="primary"
+            class="w-full mt-2"
+            auto-insert-space
+            @click="handleUnlock"
+            v-ripple
+          >
             {{ $t('lockScreen.unlock.btnText') }}
           </ElButton>
           <div class="w-full text-center">

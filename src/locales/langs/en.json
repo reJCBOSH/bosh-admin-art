@@ -186,7 +186,7 @@
     "toLogin": "To login"
   },
   "lockScreen": {
-    "pwdError": "Password error",
+    "pwdError": "Unlock password error",
     "lock": {
       "inputPlaceholder": "Please input lock screen password",
       "btnText": "Lock"
