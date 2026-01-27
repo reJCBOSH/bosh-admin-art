@@ -49,7 +49,7 @@
           tooltip:
             '一级父级菜单：填写 /index/index\n具体页面：填写组件路径（如 /system/user）\n目录菜单：留空'
         },
-        { label: '图标', prop: 'icon' },
+        { label: '图标', prop: 'icon', slot: 'icon' },
         { label: '文本徽章', prop: 'showTextBadge' },
         {
           label: '激活路径',
@@ -75,7 +75,7 @@
         { label: '上级菜单', prop: 'parentId', slot: 'parentId', span: 24 },
         { label: '菜单名称', prop: 'title' },
         { label: '路由名称', prop: 'name', tooltip: '必须保持唯一' },
-        { label: '图标', prop: 'icon' },
+        { label: '图标', prop: 'icon', slot: 'icon' },
         { label: '链接', prop: 'link' },
         { label: '文本徽章', prop: 'showTextBadge' },
         {
@@ -192,6 +192,9 @@
             <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
           </template>
         </ElCascader>
+      </template>
+      <template #icon>
+        <ArtIconSelect v-model="formData.icon" />
       </template>
     </ArtForm>
     <template #footer>
