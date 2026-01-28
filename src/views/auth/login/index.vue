@@ -153,10 +153,9 @@
 
   const loading = ref(false)
 
-  const getPublicKey = () => {
-    fetchPublicKeyGet().then((res) => {
-      publicKey.value = res
-    })
+  const getPublicKey = async () => {
+    const res = await fetchPublicKeyGet()
+    publicKey.value = res
   }
 
   // 登录
