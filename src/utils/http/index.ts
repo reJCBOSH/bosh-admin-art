@@ -84,12 +84,18 @@ const axiosInstance = axios.create({
 /** 请求拦截器 */
 axiosInstance.interceptors.request.use(
   async (request: InternalAxiosRequestConfig) => {
-    if (request.data && !(request.data instanceof FormData) && !request.headers['Content-Type']) {
+    // 只有当数据不是FormData且没有显式设置Content-Type时才设置为application/json
+    if (
+      request.data &&
+      !(request.data instanceof FormData) &&
+      !request.headers['Content-Type'] &&
+      !request.headers.get('Content-Type')
+    ) {
       request.headers.set('Content-Type', 'application/json')
-      request.data = JSON.stringify(request.data)
     }
+
     // 检查是否在白名单中
-    const isInWhiteList = WHITE_LIST_APIS.some((url) => request.url?.endsWith(url))
+    const isInWhiteList = WHITE_LIST_APIS.some((url) => request.url?.includes(url))
 
     if (!isInWhiteList) {
       const useUser = useUserStore()
@@ -98,22 +104,39 @@ axiosInstance.interceptors.request.use(
         // 提前5分钟刷新，防止前端请求时access token未过期，到后端access token过期的情况
         const expired = useUser.expiresAt - now <= TOKEN_REFRESH_DURATION
         if (expired) {
+          // 检查是否有refreshToken可用
+          if (!useUser.refreshToken) {
+            // 如果没有refreshToken，直接登出
+            setTimeout(() => {
+              useUserStore().logOut()
+            }, LOGOUT_DELAY)
+            return Promise.reject(new Error('No refresh token available'))
+          }
+
           if (!isRefreshing) {
             isRefreshing = true
             try {
               const res = await fetchRefreshToken({ refreshToken: useUser.refreshToken })
               useUser.setToken(res.accessToken, res.refreshToken, res.expiresAt)
               request.headers.set('Authorization', useUser.formatToken(res.accessToken))
-              requests.forEach((callback) => callback(res.accessToken))
+
+              // 成功刷新token后，处理等待队列中的请求
+              const requestsCopy = [...requests]
               requests = []
+              requestsCopy.forEach((callback) => callback(res.accessToken))
             } catch (error) {
               // 刷新token失败时，需要重置刷新状态，并清空待执行请求队列
+              const requestsCopy = [...requests]
               requests = []
-              // 让所有等待的请求失败
-              requests.forEach((callback) => callback(null))
+
+              // 通知所有等待的请求token刷新失败
+              requestsCopy.forEach((callback) => callback(null))
+
+              // 直接退出登录
               setTimeout(() => {
                 useUserStore().logOut()
               }, LOGOUT_DELAY)
+
               return Promise.reject(error)
             } finally {
               isRefreshing = false
@@ -121,12 +144,12 @@ axiosInstance.interceptors.request.use(
           } else {
             // 正在刷新token，将请求加入队列等待
             return new Promise((resolve, reject) => {
-              requests.push((newToken: string) => {
+              requests.push((newToken: string | null) => {
                 if (newToken) {
                   request.headers.set('Authorization', useUser.formatToken(newToken))
                   resolve(request)
                 } else {
-                  // token刷新失败，拒绝所有等待的请求
+                  // token刷新失败，拒绝请求
                   reject(new Error('Token refresh failed'))
                 }
               })
@@ -154,7 +177,13 @@ axiosInstance.interceptors.response.use(
     throw createHttpError(msg || $t('httpMsg.requestFailed'), code)
   },
   (error) => {
-    if (error.response?.status === ApiStatus.unauthorized) handleUnauthorizedError()
+    // 对于白名单API，不处理401错误，避免在登录等公共接口上触发登出
+    const requestUrl = error.config?.url || ''
+    const isInWhiteList = WHITE_LIST_APIS.some((url) => requestUrl.includes(url))
+
+    if (error.response?.status === ApiStatus.unauthorized && !isInWhiteList) {
+      handleUnauthorizedError()
+    }
     return Promise.reject(handleError(error))
   }
 )
