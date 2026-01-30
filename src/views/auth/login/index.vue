@@ -10,14 +10,7 @@
         <div class="form">
           <h3 class="title">{{ $t('login.title') }}</h3>
           <p class="sub-title">{{ $t('login.subTitle') }}</p>
-          <ElForm
-            ref="formRef"
-            class="mt-16"
-            :model="formData"
-            :rules="rules"
-            :key="formKey"
-            @keyup.enter="handleSubmit"
-          >
+          <ElForm ref="formRef" class="mt-16" :model="formData" :rules="rules" :key="formKey">
             <ElFormItem prop="username">
               <ElInput
                 v-model.trim="formData.username"
@@ -82,6 +75,7 @@
                 type="primary"
                 @click="handleSubmit"
                 :loading="loading"
+                :disabled="loading"
                 auto-insert-space
                 v-ripple
               >
@@ -105,6 +99,7 @@
   import { useSettingStore } from '@/store/modules/setting'
   import { fetchPublicKeyGet } from '@/api/basic'
   import { JSEncrypt } from 'jsencrypt'
+  import { debounce } from '@pureadmin/utils'
 
   defineOptions({ name: 'Login' })
 
@@ -162,6 +157,10 @@
   const handleSubmit = async () => {
     formRef.value?.validate(async (valid) => {
       if (valid) {
+        if (!isPassing.value) {
+          ElMessage.error(t('login.placeholder.slider'))
+          return
+        }
         try {
           loading.value = true
           if (!publicKey.value) {
@@ -205,6 +204,12 @@
       }
     })
   }
+
+  useEventListener(document, 'keydown', ({ code }) => {
+    if (['Enter', 'NumpadEnter'].includes(code) && !loading.value) {
+      debounce(handleSubmit(), 1000, true)
+    }
+  })
 
   // 重置拖拽验证
   const resetDragVerify = () => {
