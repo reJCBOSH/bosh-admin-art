@@ -33,7 +33,7 @@
           </div>
         </div>
         <ul class="py-3 mt-3 border-t border-g-300/80">
-          <li class="btn-item" @click="goPage('/system/user-center')">
+          <li class="btn-item" @click="goPage('/system/userCenter')">
             <ArtSvgIcon icon="ri:user-3-line" />
             <span>{{ $t('topBar.user.userCenter') }}</span>
           </li>

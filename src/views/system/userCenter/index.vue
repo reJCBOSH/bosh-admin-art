@@ -45,9 +45,10 @@
           </div>
         </div>
       </div>
+
       <div class="flex-1 overflow-hidden max-md:w-full max-md:mt-3.5">
         <div class="art-card-sm">
-          <h1 class="p-4 text-xl font-normal border-b border-g-300">基本设置</h1>
+          <div class="text-lg font-normal border-b border-g-300 px-4 py-3">基本信息</div>
 
           <ElForm
             :model="form"
@@ -104,49 +105,65 @@
         </div>
 
         <div class="art-card-sm my-5">
-          <h1 class="p-4 text-xl font-normal border-b border-g-300">更改密码</h1>
+          <div class="flex items-center justify-between px-4 py-3">
+            <div class="text-lg font-normal">修改密码</div>
+            <ElButton type="primary" class="w-22.5" v-ripple @click="showPwdEditDialog">
+              修改
+            </ElButton>
+          </div>
+        </div>
 
-          <ElForm :model="pwdForm" class="box-border p-5" label-width="86px" label-position="top">
-            <ElFormItem label="当前密码" prop="password">
+        <ElDialog v-model="editPwdVisible" title="修改密码" :width="600">
+          <ElAlert
+            title="密码格式：8-16位字母、数字、特殊字符!@#$%^&*?.的组合"
+            type="warning"
+            show-icon
+            :closable="false"
+          />
+          <ElForm
+            ref="pwdFormRef"
+            :model="pwdForm"
+            :rules="pwdFormRule"
+            class="box-border p-3"
+            label-width="auto"
+          >
+            <ElFormItem label="当前密码" prop="oldPassword">
               <ElInput
-                v-model="pwdForm.password"
+                v-model="pwdForm.oldPassword"
                 type="password"
-                :disabled="!isEditPwd"
                 show-password
+                placeholder="请输入当前密码"
               />
             </ElFormItem>
-
             <ElFormItem label="新密码" prop="newPassword">
               <ElInput
                 v-model="pwdForm.newPassword"
                 type="password"
-                :disabled="!isEditPwd"
                 show-password
+                placeholder="请输入新密码"
               />
             </ElFormItem>
-
-            <ElFormItem label="确认新密码" prop="confirmPassword">
+            <ElFormItem label="确认新密码" prop="rePassword">
               <ElInput
-                v-model="pwdForm.confirmPassword"
+                v-model="pwdForm.rePassword"
                 type="password"
-                :disabled="!isEditPwd"
                 show-password
+                placeholder="请重复输入新密码"
               />
             </ElFormItem>
-
-            <div class="flex-c justify-end [&_.el-button]:!w-27.5">
-              <ElButton type="primary" class="w-22.5" v-ripple @click="editPwd">
-                {{ isEditPwd ? '保存' : '编辑' }}
-              </ElButton>
-            </div>
           </ElForm>
-        </div>
+          <template #footer>
+            <ElButton v-ripple @click="editPwdVisible = false">取消</ElButton>
+            <ElButton type="primary" v-ripple @click="handleEditPwd">保存</ElButton>
+          </template>
+        </ElDialog>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+  import { fetchEditSelfPassword } from '@/api/user'
   import { useUserStore } from '@/store/modules/user'
   import type { FormInstance, FormRules } from 'element-plus'
 
@@ -156,7 +173,6 @@
   const userInfo = computed(() => userStore.getUserInfo)
 
   const isEdit = ref(false)
-  const isEditPwd = ref(false)
   const date = ref('')
   const ruleFormRef = ref<FormInstance>()
 
@@ -171,15 +187,6 @@
     address: '广东省深圳市宝安区西乡街道101栋201',
     sex: '2',
     des: 'Art Design Pro 是一款兼具设计美学与高效开发的后台系统.'
-  })
-
-  /**
-   * 密码修改表单
-   */
-  const pwdForm = reactive({
-    password: '123456',
-    newPassword: '123456',
-    confirmPassword: '123456'
   })
 
   /**
@@ -238,10 +245,72 @@
     isEdit.value = !isEdit.value
   }
 
-  /**
-   * 切换密码编辑状态
-   */
-  const editPwd = () => {
-    isEditPwd.value = !isEditPwd.value
+  const pwdFormRef = ref()
+  const REGEXP_PWD = /^(?=.*\d)(?=.*[A-Za-z])(?=.*[!@#$%^&*?.])[A-Za-z0-9!@#$%^&*?.]{8,16}$/
+  const pwdFormRule = reactive<FormRules>({
+    oldPassword: [{ required: true, message: '请输入旧密码', trigger: 'blur' }],
+    newPassword: [
+      { required: true, message: '请输入新密码', trigger: 'blur' },
+      {
+        validator: (rule: any, value: any, callback: any) => {
+          if (value === pwdForm.oldPassword) {
+            return callback(new Error('新密码不能与旧密码一致'))
+          }
+          if (!REGEXP_PWD.test(value)) {
+            return callback(new Error('密码格式不正确'))
+          }
+          callback()
+        },
+        trigger: 'blur'
+      }
+    ],
+    rePassword: [
+      { required: true, message: '请输入确认密码', trigger: 'blur' },
+      {
+        validator: (rule: any, value: any, callback: any) => {
+          if (value !== pwdForm.newPassword) {
+            return callback(new Error('重复密码与新密码不一致'))
+          }
+          if (!REGEXP_PWD.test(value)) {
+            return callback(new Error('密码格式不正确'))
+          }
+          callback()
+        },
+        trigger: 'blur'
+      }
+    ]
+  })
+  const editPwdVisible = ref(false)
+  const editPwdLoading = ref(false)
+  const pwdForm = reactive({
+    oldPassword: '',
+    newPassword: '',
+    rePassword: ''
+  })
+
+  function showPwdEditDialog() {
+    setTimeout(() => {
+      pwdFormRef.value.resetFields()
+    })
+    editPwdLoading.value = false
+    editPwdVisible.value = true
+  }
+
+  function handleEditPwd() {
+    pwdFormRef.value.validate(async (valid: boolean) => {
+      if (valid) {
+        editPwdLoading.value = true
+        fetchEditSelfPassword(pwdForm)
+          .then(() => {
+            ElMessage.success('修改密码成功')
+            editPwdVisible.value = false
+          })
+          .finally(() => {
+            editPwdLoading.value = false
+          })
+      } else {
+        ElMessage.error('请填写正确的表单')
+      }
+    })
   }
 </script>

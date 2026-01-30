@@ -60,3 +60,10 @@ export function fetchResetPassword(params: object) {
     params
   })
 }
+
+export function fetchEditSelfPassword(params: object) {
+  return request.post<any>({
+    url: '/api/system/user/editSelfPassword',
+    params
+  })
+}
