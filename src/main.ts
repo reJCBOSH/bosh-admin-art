@@ -22,5 +22,11 @@ initRouter(app)
 setupGlobDirectives(app)
 setupErrorHandle(app)
 
+// 全局注册vue-tippy
+import 'tippy.js/dist/tippy.css'
+import 'tippy.js/themes/light.css'
+import VueTippy from 'vue-tippy'
+app.use(VueTippy)
+
 app.use(language)
 app.mount('#app')
