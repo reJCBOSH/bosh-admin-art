@@ -496,6 +496,13 @@ html.dark .el-card {
 .el-picker-panel__icon-btn {
   line-height: 1;
   padding: 1px 6px;
+  font-size: 14px !important;
+  margin-top: 5px !important;
+}
+
+.el-date-picker__prev-btn,
+.el-date-picker__next-btn {
+  height: 26px !important;
 }
 
 // 优化树型菜单样式
